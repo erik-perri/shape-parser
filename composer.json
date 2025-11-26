@@ -1,0 +1,28 @@
+{
+    "name": "sourcetoad/shape-parser",
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.4",
+        "phpstan/phpstan": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sourcetoad\\ShapeParser\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sourcetoad\\ShapeParser\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "check-code": [
+            "@phpstan",
+            "@test"
+        ],
+        "phpstan": "@php vendor/bin/phpstan analyse",
+        "test": "@php vendor/bin/phpunit"
+    }
+}
