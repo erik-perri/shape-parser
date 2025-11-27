@@ -11,10 +11,8 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class ShapeFactory
 {
     /**
-     * @template Tk of array-key
-     * @template Tv
-     * @param array<Tk, ParserContract<Tv>> $shape
-     * @return ObjectParser<Tk, Tv>
+     * @param array<string, ParserContract<mixed>> $shape
+     * @return ObjectParser<array<array-key, mixed>>
      */
     public function object(array $shape): ObjectParser
     {

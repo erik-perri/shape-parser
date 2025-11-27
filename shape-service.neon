@@ -1,0 +1,5 @@
+services:
+    -
+        class: Sourcetoad\ShapeParser\PHPStan\ShapeFactoryDynamicReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

@@ -8,7 +8,7 @@ use Sourcetoad\ShapeParser\Data\ParseResultData;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 
 /**
- * @template T
+ * @template-covariant T
  */
 interface ParserContract
 {

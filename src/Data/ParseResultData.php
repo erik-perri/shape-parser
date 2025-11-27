@@ -7,7 +7,7 @@ namespace Sourcetoad\ShapeParser\Data;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 
 /**
- * @template T
+ * @template-covariant T
  */
 final readonly class ParseResultData
 {

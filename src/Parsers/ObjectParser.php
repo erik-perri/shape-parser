@@ -7,16 +7,16 @@ namespace Sourcetoad\ShapeParser\Parsers;
 use ParseError;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use stdClass;
 
 /**
- * @template Tk of array-key
- * @template Tv
- * @extends BaseParser<array<Tk, Tv>>
+ * @template T of array<mixed>
+ * @extends BaseParser<T>
  */
 final readonly class ObjectParser extends BaseParser
 {
     /**
-     * @param array<Tk, ParserContract<Tv>> $shape
+     * @param array<string, ParserContract<mixed>> $shape
      */
     public function __construct(
         private array $shape,
@@ -26,12 +26,12 @@ final readonly class ObjectParser extends BaseParser
 
     /**
      * @param mixed $data
-     * @return array<Tk, Tv>
+     * @return T
      * @throws ParseException
      */
     public function parse(mixed $data): array
     {
-        if (!is_array($data) && !($data instanceof \stdClass)) {
+        if (!is_array($data) && !($data instanceof stdClass)) {
             throw new ParseException("Expected object or array, got " . get_debug_type($data));
         }
 
@@ -57,6 +57,7 @@ final readonly class ObjectParser extends BaseParser
             throw new ParseException('Failed to parse object.');
         }
 
+        // @phpstan-ignore return.type
         return $result;
     }
 }
