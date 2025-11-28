@@ -56,6 +56,21 @@ class ShapeFactoryTypeTest
         assertType('list<string>', $result);
     }
 
+    public function testRecord(): void
+    {
+        // Arrange
+        $data = json_decode('{"foo": 123, "bar": 456}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->record($factory->string(), $factory->integer());;
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array<string, int>', $result);
+    }
+
     public function testObjectShape(): void
     {
         // Arrange

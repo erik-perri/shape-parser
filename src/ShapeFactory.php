@@ -7,6 +7,7 @@ namespace Sourcetoad\ShapeParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
+use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
 
 class ShapeFactory
@@ -33,6 +34,18 @@ class ShapeFactory
     public function object(array $shape): ObjectParser
     {
         return new ObjectParser($shape);
+    }
+
+    /**
+     * @template K of array-key
+     * @template T
+     * @param ParserContract<K> $keyParser
+     * @param ParserContract<T> $valueParser
+     * @return RecordParser<K, T>
+     */
+    public function record(ParserContract $keyParser, ParserContract $valueParser): RecordParser
+    {
+        return new RecordParser($keyParser, $valueParser);
     }
 
     public function string(): StringParser

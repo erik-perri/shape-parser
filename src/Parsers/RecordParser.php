@@ -9,54 +9,58 @@ use Sourcetoad\ShapeParser\ParserContract;
 use stdClass;
 
 /**
+ * @template K of array-key
  * @template T of mixed
- * @extends BaseParser<list<T>>
+ * @extends BaseParser<array<K, T>>
  */
-final readonly class ListParser extends BaseParser
+final readonly class RecordParser extends BaseParser
 {
     /**
-     * @param ParserContract<T> $parser
+     * @param ParserContract<K> $keyParser
+     * @param ParserContract<T> $valueParser
      */
     public function __construct(
-        private ParserContract $parser,
+        private ParserContract $keyParser,
+        private ParserContract $valueParser,
     ) {
         //
     }
 
     /**
      * @param mixed $data
-     * @return list<T>
+     * @return array<K, T>
      * @throws ParseException
      */
     public function parse(mixed $data): array
     {
         if (!is_array($data) && !($data instanceof stdClass)) {
-            throw new ParseException("Expected list, got " . get_debug_type($data));
+            throw new ParseException("Expected record, got " . get_debug_type($data));
         }
 
         $data = (array) $data;
 
-        if (!array_is_list($data)) {
-            throw new ParseException("Expected list, got array with keys " . implode(', ', array_keys($data)));
-        }
-
+        /**
+         * @var array<K, T> $result
+         */
         $result = [];
         $errors = [];
 
-        foreach ($data as $index => $value) {
+        foreach ($data as $key => $value) {
             try {
-                $result[$index] = $this->parser->parse($value);
+                $key = $this->keyParser->parse($key);
+                $value = $this->valueParser->parse($value);
+
+                $result[$key] = $value;
             } catch (ParseException $e) {
-                $errors[$index] = $e;
+                $errors[$key] = $e;
             }
         }
 
         if (!empty($errors)) {
             // TODO Better error reporting
-            throw new ParseException('Failed to parse list.');
+            throw new ParseException('Failed to parse record');
         }
 
-        // @phpstan-ignore return.type
         return $result;
     }
 }

@@ -32,7 +32,7 @@ final readonly class ObjectParser extends BaseParser
     public function parse(mixed $data): array
     {
         if (!is_array($data) && !($data instanceof stdClass)) {
-            throw new ParseException("Expected object or array, got " . get_debug_type($data));
+            throw new ParseException("Expected object, got " . get_debug_type($data));
         }
 
         $data = (array) $data;
