@@ -54,7 +54,7 @@ final readonly class ObjectParser extends BaseParser
 
         if (!empty($errors)) {
             // TODO Better error reporting
-            throw new ParseException('Failed to parse object.');
+            throw new ParseException('Failed to parse object');
         }
 
         // @phpstan-ignore return.type
