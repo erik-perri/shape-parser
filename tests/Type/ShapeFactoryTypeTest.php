@@ -41,6 +41,21 @@ class ShapeFactoryTypeTest
         assertType('string', $result);
     }
 
+    public function testList(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", "bar"]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->list($factory->string());
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('list<string>', $result);
+    }
+
     public function testObjectShape(): void
     {
         // Arrange
@@ -62,12 +77,13 @@ class ShapeFactoryTypeTest
     public function testNestedObjectShape(): void
     {
         // Arrange
-        $data = json_decode('{"data": {"stringValue": "foo"}}');
+        $data = json_decode('{"data": {"stringValue": "foo", "listValue":  ["foo", "bar"]}}');
 
         $factory = new ShapeFactory();
         $parser = $factory->object([
             'data' => $factory->object([
                 'stringValue' => $factory->string(),
+                'listValue' => $factory->list($factory->string()),
             ]),
         ]);
 
@@ -75,7 +91,7 @@ class ShapeFactoryTypeTest
         $result = $parser->parse($data);
 
         // Assert
-        assertType('array{data: array{stringValue: string}}', $result);
+        assertType('array{data: array{stringValue: string, listValue: list<string>}}', $result);
     }
 
     public function testUnionShape(): void
