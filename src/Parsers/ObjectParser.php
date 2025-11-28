@@ -24,6 +24,12 @@ final readonly class ObjectParser extends BaseParser
         //
     }
 
+    public function describe(): string
+    {
+        // TODO Expand?
+        return 'object';
+    }
+
     /**
      * @param mixed $data
      * @return T
@@ -32,7 +38,7 @@ final readonly class ObjectParser extends BaseParser
     public function parse(mixed $data): array
     {
         if (!is_array($data) && !($data instanceof stdClass)) {
-            throw new ParseException("Expected object, got " . get_debug_type($data));
+            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;

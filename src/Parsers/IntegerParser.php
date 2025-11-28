@@ -11,10 +11,15 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
  */
 final readonly class IntegerParser extends BaseParser
 {
+    public function describe(): string
+    {
+        return 'int';
+    }
+
     public function parse(mixed $data): int
     {
         if (!is_int($data)) {
-            throw new ParseException("Expected int, got " . get_debug_type($data));
+            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;

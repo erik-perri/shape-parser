@@ -26,6 +26,11 @@ final readonly class RecordParser extends BaseParser
         //
     }
 
+    public function describe(): string
+    {
+        return sprintf('record<%s, %s>', $this->keyParser->describe(), $this->valueParser->describe());
+    }
+
     /**
      * @param mixed $data
      * @return array<K, T>
@@ -34,7 +39,7 @@ final readonly class RecordParser extends BaseParser
     public function parse(mixed $data): array
     {
         if (!is_array($data) && !($data instanceof stdClass)) {
-            throw new ParseException("Expected record, got " . get_debug_type($data));
+            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;

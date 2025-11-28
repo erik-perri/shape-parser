@@ -23,6 +23,11 @@ final readonly class ListParser extends BaseParser
         //
     }
 
+    public function describe(): string
+    {
+        return sprintf('list<%s>', $this->parser->describe());
+    }
+
     /**
      * @param mixed $data
      * @return list<T>
@@ -31,13 +36,17 @@ final readonly class ListParser extends BaseParser
     public function parse(mixed $data): array
     {
         if (!is_array($data) && !($data instanceof stdClass)) {
-            throw new ParseException("Expected list, got " . get_debug_type($data));
+            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
         if (!array_is_list($data)) {
-            throw new ParseException("Expected list, got array with keys " . implode(', ', array_keys($data)));
+            throw new ParseException(sprintf(
+                'Expected %s, got array with keys: %s',
+                $this->describe(),
+                implode(', ', array_keys($data)),
+            ));
         }
 
         $result = [];
@@ -53,7 +62,7 @@ final readonly class ListParser extends BaseParser
 
         if (!empty($errors)) {
             // TODO Better error reporting
-            throw new ParseException('Failed to parse list.');
+            throw new ParseException('Failed to parse list');
         }
 
         // @phpstan-ignore return.type

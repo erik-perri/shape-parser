@@ -53,7 +53,7 @@ class RecordParserTest extends TestCase
     {
         // Expectations
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Expected record, got string');
+        $this->expectExceptionMessage('Expected record<string, string>, got string');
 
         // Arrange
         $parser = new RecordParser(new StringParser(), new StringParser());

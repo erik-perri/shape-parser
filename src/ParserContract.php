@@ -12,6 +12,8 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
  */
 interface ParserContract
 {
+    public function describe(): string;
+
     /**
      * @return T
      * @throws ParseException

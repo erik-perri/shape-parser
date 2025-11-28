@@ -11,10 +11,15 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
  */
 final readonly class StringParser extends BaseParser
 {
+    public function describe(): string
+    {
+        return 'string';
+    }
+
     public function parse(mixed $data): string
     {
         if (!is_string($data)) {
-            throw new ParseException("Expected string, got " . get_debug_type($data));
+            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;
