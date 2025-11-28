@@ -11,6 +11,7 @@ use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
+use Sourcetoad\ShapeParser\Parsers\UnionParser;
 
 #[CoversClass(RecordParser::class)]
 class RecordParserTest extends TestCase
@@ -28,6 +29,21 @@ class RecordParserTest extends TestCase
 
         // Assert
         $this->assertSame(['a' => ['foo' => 'bar'], 'b' => ['foo' => 'baz']], $result);
+    }
+
+    public function testParseHandlesUnions(): void
+    {
+        // Arrange
+        $parser = new RecordParser(new StringParser(), new ObjectParser([
+            'foo' => new UnionParser(new StringParser(), new IntegerParser()),
+        ]));
+        $data = json_decode('{"a": {"foo": "bar"}, "b": {"foo": 123}}');
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        $this->assertSame(['a' => ['foo' => 'bar'], 'b' => ['foo' => 123]], $result);
     }
 
     public function testParseThrowsWhenKeysAreWrongType(): void

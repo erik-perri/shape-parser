@@ -71,6 +71,21 @@ class ShapeFactoryTypeTest
         assertType('array<string, int>', $result);
     }
 
+    public function testUnion(): void
+    {
+        // Arrange
+        $data = json_decode('"foo"');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->union($factory->string(), $factory->integer());
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('int|string', $result);
+    }
+
     public function testObjectShape(): void
     {
         // Arrange

@@ -9,6 +9,7 @@ use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
+use Sourcetoad\ShapeParser\Parsers\UnionParser;
 
 class ShapeFactory
 {
@@ -51,5 +52,15 @@ class ShapeFactory
     public function string(): StringParser
     {
         return new StringParser();
+    }
+
+    /**
+     * @template T
+     * @param ParserContract<T> ...$parsers
+     * @return UnionParser<T>
+     */
+    public function union(ParserContract ...$parsers): UnionParser
+    {
+        return new UnionParser(...$parsers);
     }
 }
