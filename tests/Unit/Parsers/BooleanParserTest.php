@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Parsers\BooleanParser;
@@ -12,30 +13,35 @@ use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 #[CoversClass(BooleanParser::class)]
 class BooleanParserTest extends TestCase
 {
-    public function testParseReturnsTrueResult(): void
+    #[DataProvider('parseCasesProvider')]
+    public function testParseReturnsResult(string $json, bool $expected): void
     {
         // Arrange
         $parser = new BooleanParser();
-        $data = json_decode('true');
+        $data = json_decode($json);
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertTrue($result);
+        $this->assertSame($expected, $result);
     }
 
-    public function testParseReturnsFalseResult(): void
+    /**
+     * @return array<string, array{json: string, expected: bool}>
+     */
+    public static function parseCasesProvider(): array
     {
-        // Arrange
-        $parser = new BooleanParser();
-        $data = json_decode('false');
-
-        // Act
-        $result = $parser->parse($data);
-
-        // Assert
-        $this->assertFalse($result);
+        return [
+            'true' => [
+                'json' => 'true',
+                'expected' => true,
+            ],
+            'false' => [
+                'json' => 'false',
+                'expected' => false,
+            ],
+        ];
     }
 
     public function testParseThrowsWhenInvalid(): void

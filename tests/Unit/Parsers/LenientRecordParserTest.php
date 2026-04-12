@@ -6,6 +6,7 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
@@ -16,43 +17,39 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(LenientRecordParser::class)]
 class LenientRecordParserTest extends TestCase
 {
-    public function testParseReturnsAllEntriesWhenValid(): void
+    #[DataProvider('parseCasesProvider')]
+    public function testParse(mixed $input, array $expected): void
     {
         // Arrange
         $parser = new RecordParser(new StringParser(), new IntegerParser());
         $lenientParser = $parser->lenient();
 
         // Act
-        $result = $lenientParser->parse(json_decode('{"a": 1, "b": 2, "c": 3}'));
+        $result = $lenientParser->parse($input);
 
         // Assert
-        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+        $this->assertSame($expected, $result);
     }
 
-    public function testParseDropsEntriesWithInvalidValues(): void
+    /**
+     * @return array<string, array{input: mixed, expected: array<string, int>}>
+     */
+    public static function parseCasesProvider(): array
     {
-        // Arrange
-        $parser = new RecordParser(new StringParser(), new IntegerParser());
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $result = $lenientParser->parse(['a' => 1, 'b' => 'not int', 'c' => 3]);
-
-        // Assert
-        $this->assertSame(['a' => 1, 'c' => 3], $result);
-    }
-
-    public function testParseReturnsEmptyArrayWhenAllEntriesFail(): void
-    {
-        // Arrange
-        $parser = new RecordParser(new StringParser(), new IntegerParser());
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $result = $lenientParser->parse(['a' => 'x', 'b' => 'y']);
-
-        // Assert
-        $this->assertSame([], $result);
+        return [
+            'all valid' => [
+                'input' => json_decode('{"a": 1, "b": 2, "c": 3}'),
+                'expected' => ['a' => 1, 'b' => 2, 'c' => 3],
+            ],
+            'drops invalid entries' => [
+                'input' => ['a' => 1, 'b' => 'not int', 'c' => 3],
+                'expected' => ['a' => 1, 'c' => 3],
+            ],
+            'all entries fail' => [
+                'input' => ['a' => 'x', 'b' => 'y'],
+                'expected' => [],
+            ],
+        ];
     }
 
     public function testParseThrowsWhenInputIsNotArray(): void

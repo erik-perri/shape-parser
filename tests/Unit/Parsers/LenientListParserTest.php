@@ -6,6 +6,7 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Parsers\LenientListParser;
@@ -15,46 +16,43 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(LenientListParser::class)]
 class LenientListParserTest extends TestCase
 {
-    public function testParseReturnsAllItemsWhenValid(): void
+    #[DataProvider('parseCasesProvider')]
+    public function testParse(mixed $input, array $expected): void
     {
         // Arrange
         $parser = new ListParser(new StringParser());
         $lenientParser = $parser->lenient();
 
         // Act
-        $result = $lenientParser->parse(json_decode('["foo", "bar", "baz"]'));
+        $result = $lenientParser->parse($input);
 
         // Assert
-        $this->assertSame(['foo', 'bar', 'baz'], $result);
+        $this->assertSame($expected, $result);
     }
 
-    public function testParseDropsInvalidItems(): void
+    /**
+     * @return array<string, array{input: mixed, expected: array<mixed>}>
+     */
+    public static function parseCasesProvider(): array
     {
-        // Arrange
-        $parser = new ListParser(new StringParser());
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $result = $lenientParser->parse(['a', 123, 'b', true, 'c']);
-
-        // Assert
-        $this->assertSame(['a', 'b', 'c'], $result);
+        return [
+            'all valid' => [
+                'input' => json_decode('["foo", "bar", "baz"]'),
+                'expected' => ['foo', 'bar', 'baz'],
+            ],
+            'drops invalid items' => [
+                'input' => ['a', 123, 'b', true, 'c'],
+                'expected' => ['a', 'b', 'c'],
+            ],
+            'all items fail' => [
+                'input' => [1, 2, 3],
+                'expected' => [],
+            ],
+        ];
     }
 
-    public function testParseReturnsEmptyListWhenAllItemsFail(): void
-    {
-        // Arrange
-        $parser = new ListParser(new StringParser());
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $result = $lenientParser->parse([1, 2, 3]);
-
-        // Assert
-        $this->assertSame([], $result);
-    }
-
-    public function testParseThrowsWhenInputIsNotArray(): void
+    #[DataProvider('invalidInputProvider')]
+    public function testParseThrowsWhenInputIsInvalid(mixed $input): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -64,26 +62,25 @@ class LenientListParserTest extends TestCase
         $lenientParser = $parser->lenient();
 
         // Act
-        $lenientParser->parse('not an array');
+        $lenientParser->parse($input);
 
         // Assert
         // No assertions, only expectations.
     }
 
-    public function testParseThrowsWhenInputIsNotList(): void
+    /**
+     * @return array<string, array{input: mixed}>
+     */
+    public static function invalidInputProvider(): array
     {
-        // Expectations
-        $this->expectException(ParseException::class);
-
-        // Arrange
-        $parser = new ListParser(new StringParser());
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $lenientParser->parse(['a' => 'foo', 'b' => 'bar']);
-
-        // Assert
-        // No assertions, only expectations.
+        return [
+            'not an array' => [
+                'input' => 'not an array',
+            ],
+            'not a list' => [
+                'input' => ['a' => 'foo', 'b' => 'bar'],
+            ],
+        ];
     }
 
     public function testDescribeReturnsLenientWrappedDescription(): void

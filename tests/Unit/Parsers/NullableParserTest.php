@@ -33,17 +33,41 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{ParserContract<mixed>, mixed, mixed}>
+     * @return array<string, array{inner: ParserContract<mixed>, input: mixed, expected: mixed}>
      */
     public static function parseCasesProvider(): array
     {
         return [
-            'string valid' => [new StringParser(), 'hello', 'hello'],
-            'string null' => [new StringParser(), null, null],
-            'integer valid' => [new IntegerParser(), 42, 42],
-            'integer null' => [new IntegerParser(), null, null],
-            'boolean valid' => [new BooleanParser(), true, true],
-            'boolean null' => [new BooleanParser(), null, null],
+            'string valid' => [
+                'inner' => new StringParser(),
+                'input' => 'hello',
+                'expected' => 'hello',
+            ],
+            'string null' => [
+                'inner' => new StringParser(),
+                'input' => null,
+                'expected' => null,
+            ],
+            'integer valid' => [
+                'inner' => new IntegerParser(),
+                'input' => 42,
+                'expected' => 42,
+            ],
+            'integer null' => [
+                'inner' => new IntegerParser(),
+                'input' => null,
+                'expected' => null,
+            ],
+            'boolean valid' => [
+                'inner' => new BooleanParser(),
+                'input' => true,
+                'expected' => true,
+            ],
+            'boolean null' => [
+                'inner' => new BooleanParser(),
+                'input' => null,
+                'expected' => null,
+            ],
         ];
     }
 
@@ -64,14 +88,23 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{ParserContract<mixed>, mixed}>
+     * @return array<string, array{inner: ParserContract<mixed>, input: mixed}>
      */
     public static function invalidCasesProvider(): array
     {
         return [
-            'string given int' => [new StringParser(), 123],
-            'integer given string' => [new IntegerParser(), 'hello'],
-            'boolean given string' => [new BooleanParser(), 'not-a-bool'],
+            'string given int' => [
+                'inner' => new StringParser(),
+                'input' => 123,
+            ],
+            'integer given string' => [
+                'inner' => new IntegerParser(),
+                'input' => 'hello',
+            ],
+            'boolean given string' => [
+                'inner' => new BooleanParser(),
+                'input' => 'not-a-bool',
+            ],
         ];
     }
 
@@ -89,14 +122,23 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{ParserContract<mixed>, string}>
+     * @return array<string, array{inner: ParserContract<mixed>, expected: string}>
      */
     public static function describeCasesProvider(): array
     {
         return [
-            'string' => [new StringParser(), 'nullable<string>'],
-            'integer' => [new IntegerParser(), 'nullable<int>'],
-            'list of string' => [new ListParser(new StringParser()), 'nullable<list<string>>'],
+            'string' => [
+                'inner' => new StringParser(),
+                'expected' => 'nullable<string>',
+            ],
+            'integer' => [
+                'inner' => new IntegerParser(),
+                'expected' => 'nullable<int>',
+            ],
+            'list of string' => [
+                'inner' => new ListParser(new StringParser()),
+                'expected' => 'nullable<list<string>>',
+            ],
         ];
     }
 
