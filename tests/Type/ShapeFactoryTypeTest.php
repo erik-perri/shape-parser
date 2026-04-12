@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Tests\Type;
 
+use DateTimeImmutable;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\ShapeFactory;
 use function PHPStan\Testing\assertType;
@@ -557,5 +558,148 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType('array{name: string|null, count: int}', $result);
+    }
+
+    public function testTransformString(): void
+    {
+        // Arrange
+        $data = json_decode('"2026-04-12"');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->string()->transform(fn(string $s): DateTimeImmutable => new DateTimeImmutable($s));
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('DateTimeImmutable', $result);
+    }
+
+    public function testTransformObjectToDto(): void
+    {
+        // Arrange
+        $data = json_decode('{"id": 1, "title": "Foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'id' => $factory->integer(),
+            'title' => $factory->string(),
+        ])->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']));
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto', $result);
+    }
+
+    public function testTransformLenient(): void
+    {
+        // Arrange
+        $data = json_decode('{"id": 1, "title": "Foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'id' => $factory->integer(),
+            'title' => $factory->string(),
+        ])
+            ->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto|null', $result);
+    }
+
+    public function testTransformNullable(): void
+    {
+        // Arrange
+        $data = json_decode('{"id": 1, "title": "Foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'id' => $factory->integer(),
+            'title' => $factory->string(),
+        ])
+            ->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto|null', $result);
+    }
+
+    public function testTransformListOfHydrated(): void
+    {
+        // Arrange
+        $data = json_decode('[{"id": 1, "title": "Foo"}, {"id": 2, "title": "Bar"}]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->list(
+            $factory->object([
+                'id' => $factory->integer(),
+                'title' => $factory->string(),
+            ])->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title'])),
+        );
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('list<Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto>', $result);
+    }
+
+    public function testTransformDiscriminatedUnion(): void
+    {
+        // Arrange
+        $data = json_decode('{"version": 1, "title": "Foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->discriminatedUnion('version', [
+            $factory->object([
+                'version' => $factory->literal(1),
+                'title' => $factory->string(),
+            ])->transform(fn(array $a): TypeTestSampleDtoA => new TypeTestSampleDtoA($a['title'])),
+            $factory->object([
+                'version' => $factory->literal(2),
+                'title' => $factory->string(),
+            ])->transform(fn(array $a): TypeTestSampleDtoB => new TypeTestSampleDtoB($a['title'])),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType(
+            'Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDtoA|Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDtoB',
+            $result,
+        );
+    }
+}
+
+final readonly class TypeTestSampleDto
+{
+    public function __construct(
+        public int $id,
+        public string $title,
+    ) {
+    }
+}
+
+final readonly class TypeTestSampleDtoA
+{
+    public function __construct(public string $title)
+    {
+    }
+}
+
+final readonly class TypeTestSampleDtoB
+{
+    public function __construct(public string $title)
+    {
     }
 }

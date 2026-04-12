@@ -31,15 +31,17 @@ final readonly class DiscriminatedUnionParser extends BaseParser
         $map = [];
 
         foreach ($parsers as $i => $parser) {
-            if (!$parser instanceof ObjectParser) {
+            $objectParser = $this->unwrapToObject($parser);
+
+            if ($objectParser === null) {
                 throw new InvalidArgumentException(sprintf(
-                    'Parser at index %d must be an ObjectParser, got %s',
+                    'Parser at index %d must be an ObjectParser (optionally wrapped in TransformParser), got %s',
                     $i,
                     get_debug_type($parser),
                 ));
             }
 
-            $fieldParser = $parser->shape[$discriminator] ?? null;
+            $fieldParser = $objectParser->shape[$discriminator] ?? null;
 
             if (!$fieldParser instanceof LiteralParser) {
                 throw new InvalidArgumentException(sprintf(
@@ -72,6 +74,19 @@ final readonly class DiscriminatedUnionParser extends BaseParser
         }
 
         $this->map = $map;
+    }
+
+    /**
+     * @param ParserContract<mixed> $parser
+     * @return ObjectParser<array<mixed>>|null
+     */
+    private function unwrapToObject(ParserContract $parser): ?ObjectParser
+    {
+        return match (true) {
+            $parser instanceof ObjectParser => $parser,
+            $parser instanceof TransformParser => $this->unwrapToObject($parser->parser),
+            default => null,
+        };
     }
 
     public function describe(): string
