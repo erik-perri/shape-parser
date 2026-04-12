@@ -21,8 +21,11 @@
     "scripts": {
         "check-code": [
             "@phpstan",
+            "@lint",
             "@test"
         ],
+        "lint": "@php vendor/bin/pint --test",
+        "lint:fix": "@php vendor/bin/pint",
         "phpstan": "@php vendor/bin/phpstan analyse",
         "test": "@php vendor/bin/phpunit"
     }
