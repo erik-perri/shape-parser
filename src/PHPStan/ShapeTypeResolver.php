@@ -34,7 +34,7 @@ class ShapeTypeResolver
 
                 $parserResultType = $this->resolveParserContractGeneric($parserType);
 
-                if (!$parserResultType) {
+                if (! $parserResultType) {
                     continue;
                 }
 
@@ -53,7 +53,7 @@ class ShapeTypeResolver
 
     private function isOptionalParser(Type $parserType): bool
     {
-        if (!method_exists($parserType, 'getAncestorWithClassName')) {
+        if (! method_exists($parserType, 'getAncestorWithClassName')) {
             return false;
         }
 
@@ -62,7 +62,7 @@ class ShapeTypeResolver
 
     private function resolveParserContractGeneric(Type $parserType): ?Type
     {
-        if (!method_exists($parserType, 'getAncestorWithClassName')) {
+        if (! method_exists($parserType, 'getAncestorWithClassName')) {
             return null;
         }
 
@@ -74,7 +74,7 @@ class ShapeTypeResolver
             return null;
         }
 
-        if (!method_exists($ancestor, 'getTypes')) {
+        if (! method_exists($ancestor, 'getTypes')) {
             return null;
         }
 

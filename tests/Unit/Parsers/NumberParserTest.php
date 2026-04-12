@@ -14,10 +14,10 @@ use Sourcetoad\ShapeParser\Parsers\NumberParser;
 class NumberParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParseReturnsResult(string $json, int|float $expected): void
+    public function test_parse_returns_result(string $json, int|float $expected): void
     {
         // Arrange
-        $parser = new NumberParser();
+        $parser = new NumberParser;
         $data = json_decode($json);
 
         // Act
@@ -44,14 +44,14 @@ class NumberParserTest extends TestCase
         ];
     }
 
-    public function testParseThrowsWhenGivenString(): void
+    public function test_parse_throws_when_given_string(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Expected number, got string');
 
         // Arrange
-        $parser = new NumberParser();
+        $parser = new NumberParser;
         $data = json_decode('"1"');
 
         // Act

@@ -17,12 +17,12 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(DiscriminatedUnionParser::class)]
 class DiscriminatedUnionParserTest extends TestCase
 {
-    public function testParseReturnsResult(): void
+    public function test_parse_returns_result(): void
     {
         // Arrange
         $parser = new DiscriminatedUnionParser('type', [
-            new ObjectParser(['type' => new LiteralParser('foo'), 'value' => new StringParser()]),
-            new ObjectParser(['type' => new LiteralParser('bar'), 'bar' => new IntegerParser()]),
+            new ObjectParser(['type' => new LiteralParser('foo'), 'value' => new StringParser]),
+            new ObjectParser(['type' => new LiteralParser('bar'), 'bar' => new IntegerParser]),
         ]);
         $data = json_decode('{"type": "foo", "value": "bar"}');
 
@@ -33,7 +33,7 @@ class DiscriminatedUnionParserTest extends TestCase
         $this->assertSame(['type' => 'foo', 'value' => 'bar'], $result);
     }
 
-    public function testParseThrowsWhenInvalid(): void
+    public function test_parse_throws_when_invalid(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -41,8 +41,8 @@ class DiscriminatedUnionParserTest extends TestCase
 
         // Arrange
         $parser = new DiscriminatedUnionParser('type', [
-            new ObjectParser(['type' => new LiteralParser('foo'), 'value' => new StringParser()]),
-            new ObjectParser(['type' => new LiteralParser('bar'), 'bar' => new IntegerParser()]),
+            new ObjectParser(['type' => new LiteralParser('foo'), 'value' => new StringParser]),
+            new ObjectParser(['type' => new LiteralParser('bar'), 'bar' => new IntegerParser]),
         ]);
         $data = json_decode('{"type": "foo", "value": 123}');
 
@@ -53,17 +53,17 @@ class DiscriminatedUnionParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testParseAcceptsTransformParserVariant(): void
+    public function test_parse_accepts_transform_parser_variant(): void
     {
         // Arrange
         $fooVariant = (new ObjectParser([
             'type' => new LiteralParser('foo'),
-            'value' => new StringParser(),
-        ]))->transform(fn(array $a) => strtoupper($a['value']));
+            'value' => new StringParser,
+        ]))->transform(fn (array $a) => strtoupper($a['value']));
         $barVariant = (new ObjectParser([
             'type' => new LiteralParser('bar'),
-            'bar' => new IntegerParser(),
-        ]))->transform(fn(array $a) => $a['bar'] * 2);
+            'bar' => new IntegerParser,
+        ]))->transform(fn (array $a) => $a['bar'] * 2);
 
         $parser = new DiscriminatedUnionParser('type', [$fooVariant, $barVariant]);
 
@@ -76,15 +76,15 @@ class DiscriminatedUnionParserTest extends TestCase
         $this->assertSame(42, $barResult);
     }
 
-    public function testParseAcceptsChainedTransformParserVariant(): void
+    public function test_parse_accepts_chained_transform_parser_variant(): void
     {
         // Arrange
         $variant = (new ObjectParser([
             'type' => new LiteralParser('foo'),
-            'value' => new IntegerParser(),
+            'value' => new IntegerParser,
         ]))
-            ->transform(fn(array $a) => $a['value'] + 1)
-            ->transform(fn(int $i) => $i * 10);
+            ->transform(fn (array $a) => $a['value'] + 1)
+            ->transform(fn (int $i) => $i * 10);
 
         $parser = new DiscriminatedUnionParser('type', [$variant]);
 
@@ -95,7 +95,7 @@ class DiscriminatedUnionParserTest extends TestCase
         $this->assertSame(50, $result);
     }
 
-    public function testConstructorRejectsBareStringParserVariant(): void
+    public function test_constructor_rejects_bare_string_parser_variant(): void
     {
         // Expectations
         $this->expectException(InvalidArgumentException::class);
@@ -103,14 +103,14 @@ class DiscriminatedUnionParserTest extends TestCase
 
         // Arrange + Act
         new DiscriminatedUnionParser('type', [
-            new StringParser(),
+            new StringParser,
         ]);
 
         // Assert
         // No assertions, only expectations.
     }
 
-    public function testConstructorRejectsNullableObjectParserVariant(): void
+    public function test_constructor_rejects_nullable_object_parser_variant(): void
     {
         // Expectations
         $this->expectException(InvalidArgumentException::class);

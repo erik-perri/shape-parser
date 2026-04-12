@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Sourcetoad\ShapeParser\Tests\Type;
 
 use DateTimeImmutable;
-use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\ShapeFactory;
+
 use function PHPStan\Testing\assertType;
 
 class ShapeFactoryTypeTest
@@ -18,7 +18,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('[{"type": "a", "foo": 1}, {"type": "b", "bar": "baz"}]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->discriminatedUnion(
             'type',
             [
@@ -39,7 +39,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('true');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->boolean();
 
         // Act
@@ -54,7 +54,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->float();
 
         // Act
@@ -69,7 +69,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('123');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->integer();
 
         // Act
@@ -84,7 +84,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->number();
 
         // Act
@@ -99,7 +99,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"foo"');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->string();
 
         // Act
@@ -114,7 +114,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('["foo", "bar"]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list($factory->string());
 
         // Act
@@ -129,8 +129,8 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"foo": 123, "bar": 456}');
 
-        $factory = new ShapeFactory();
-        $parser = $factory->record($factory->string(), $factory->integer());;
+        $factory = new ShapeFactory;
+        $parser = $factory->record($factory->string(), $factory->integer());
 
         // Act
         $result = $parser->parse($data);
@@ -144,7 +144,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"foo"');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->union($factory->string(), $factory->integer());
 
         // Act
@@ -159,7 +159,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"stringValue": "foo", "integerValue": 123}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'stringValue' => $factory->string(),
             'integerValue' => $factory->integer(),
@@ -177,7 +177,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"data": {"stringValue": "foo", "listValue":  ["foo", "bar"]}}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'data' => $factory->object([
                 'stringValue' => $factory->string(),
@@ -195,7 +195,7 @@ class ShapeFactoryTypeTest
     public function testUnionShape(): void
     {
         // Arrange
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
 
         if (random_int(0, 1) === 0) {
             $data = json_decode('{"data": {"stringValue": 123}}');
@@ -223,7 +223,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([]);
 
         // Act
@@ -238,7 +238,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->float()->lenient();
 
         // Act
@@ -253,7 +253,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->number()->lenient();
 
         // Act
@@ -268,7 +268,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('true');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->boolean()->lenient();
 
         // Act
@@ -283,7 +283,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"foo"');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->string()->lenient();
 
         // Act
@@ -298,7 +298,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('123');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->integer()->lenient();
 
         // Act
@@ -313,7 +313,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('["foo", "bar"]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list($factory->string())->lenient();
 
         // Act
@@ -328,7 +328,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"foo": 123, "bar": 456}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->record($factory->string(), $factory->integer())->lenient();
 
         // Act
@@ -343,7 +343,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"stringValue": "foo", "integerValue": 123}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'stringValue' => $factory->string(),
             'integerValue' => $factory->integer(),
@@ -361,7 +361,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"foo"');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->string()->lenient()->fallback('fallback');
 
         // Act
@@ -376,7 +376,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('123');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->integer()->lenient()->fallback(0);
 
         // Act
@@ -391,7 +391,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"name": "foo", "count": 123}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'name' => $factory->string()->lenient()->fallback('unknown'),
             'count' => $factory->integer()->lenient()->fallback(0),
@@ -409,7 +409,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('["foo", "bar"]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list($factory->string()->lenient());
 
         // Act
@@ -424,7 +424,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"foo"');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->string()->nullable();
 
         // Act
@@ -439,7 +439,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('123');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->integer()->nullable();
 
         // Act
@@ -454,7 +454,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('true');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->boolean()->nullable();
 
         // Act
@@ -469,7 +469,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->float()->nullable();
 
         // Act
@@ -484,7 +484,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('1.5');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->number()->nullable();
 
         // Act
@@ -499,7 +499,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('["foo", "bar"]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list($factory->string())->nullable();
 
         // Act
@@ -514,7 +514,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"foo": 123, "bar": 456}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->record($factory->string(), $factory->integer())->nullable();
 
         // Act
@@ -529,7 +529,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"stringValue": "foo", "integerValue": 123}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'stringValue' => $factory->string(),
             'integerValue' => $factory->integer(),
@@ -547,7 +547,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"name": "foo", "count": 123}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'name' => $factory->string()->nullable(),
             'count' => $factory->integer(),
@@ -565,7 +565,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"name": "foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'name' => $factory->string(),
             'count' => $factory->integer()->optional(),
@@ -583,7 +583,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"name": "foo", "count": null}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'name' => $factory->string(),
             'count' => $factory->integer()->nullable()->optional(),
@@ -601,7 +601,7 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"name": "foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'name' => $factory->string(),
             'address' => $factory->object([
@@ -621,8 +621,8 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('"2026-04-12"');
 
-        $factory = new ShapeFactory();
-        $parser = $factory->string()->transform(fn(string $s): DateTimeImmutable => new DateTimeImmutable($s));
+        $factory = new ShapeFactory;
+        $parser = $factory->string()->transform(fn (string $s): DateTimeImmutable => new DateTimeImmutable($s));
 
         // Act
         $result = $parser->parse($data);
@@ -636,11 +636,11 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"id": 1, "title": "Foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'id' => $factory->integer(),
             'title' => $factory->string(),
-        ])->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']));
+        ])->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']));
 
         // Act
         $result = $parser->parse($data);
@@ -654,12 +654,12 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"id": 1, "title": "Foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'id' => $factory->integer(),
             'title' => $factory->string(),
         ])
-            ->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
             ->lenient();
 
         // Act
@@ -674,12 +674,12 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"id": 1, "title": "Foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'id' => $factory->integer(),
             'title' => $factory->string(),
         ])
-            ->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
             ->nullable();
 
         // Act
@@ -694,12 +694,12 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('[{"id": 1, "title": "Foo"}, {"id": 2, "title": "Bar"}]');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list(
             $factory->object([
                 'id' => $factory->integer(),
                 'title' => $factory->string(),
-            ])->transform(fn(array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title'])),
+            ])->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title'])),
         );
 
         // Act
@@ -714,16 +714,16 @@ class ShapeFactoryTypeTest
         // Arrange
         $data = json_decode('{"version": 1, "title": "Foo"}');
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->discriminatedUnion('version', [
             $factory->object([
                 'version' => $factory->literal(1),
                 'title' => $factory->string(),
-            ])->transform(fn(array $a): TypeTestSampleDtoA => new TypeTestSampleDtoA($a['title'])),
+            ])->transform(fn (array $a): TypeTestSampleDtoA => new TypeTestSampleDtoA($a['title'])),
             $factory->object([
                 'version' => $factory->literal(2),
                 'title' => $factory->string(),
-            ])->transform(fn(array $a): TypeTestSampleDtoB => new TypeTestSampleDtoB($a['title'])),
+            ])->transform(fn (array $a): TypeTestSampleDtoB => new TypeTestSampleDtoB($a['title'])),
         ]);
 
         // Act
@@ -742,20 +742,15 @@ final readonly class TypeTestSampleDto
     public function __construct(
         public int $id,
         public string $title,
-    ) {
-    }
+    ) {}
 }
 
 final readonly class TypeTestSampleDtoA
 {
-    public function __construct(public string $title)
-    {
-    }
+    public function __construct(public string $title) {}
 }
 
 final readonly class TypeTestSampleDtoB
 {
-    public function __construct(public string $title)
-    {
-    }
+    public function __construct(public string $title) {}
 }

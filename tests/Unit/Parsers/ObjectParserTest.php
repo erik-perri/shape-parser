@@ -14,13 +14,13 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(ObjectParser::class)]
 class ObjectParserTest extends TestCase
 {
-    public function testParseReturnsResult(): void
+    public function test_parse_returns_result(): void
     {
         // Arrange
         $parser = new ObjectParser([
-            'foo' => new StringParser(),
+            'foo' => new StringParser,
             'bar' => new ObjectParser([
-                'baz' => new IntegerParser(),
+                'baz' => new IntegerParser,
             ]),
         ]);
         $data = json_decode('{"foo": "bar", "bar": {"baz": 123}}');
@@ -32,7 +32,7 @@ class ObjectParserTest extends TestCase
         $this->assertSame(['foo' => 'bar', 'bar' => ['baz' => 123]], $result);
     }
 
-    public function testParseThrowsWhenInvalid(): void
+    public function test_parse_throws_when_invalid(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -40,7 +40,7 @@ class ObjectParserTest extends TestCase
 
         // Arrange
         $parser = new ObjectParser([
-            'foo' => new StringParser(),
+            'foo' => new StringParser,
         ]);
         $data = json_decode('{"bar": "foo"}');
 
@@ -51,12 +51,12 @@ class ObjectParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testOptionalFieldOmittedWhenAbsent(): void
+    public function test_optional_field_omitted_when_absent(): void
     {
         // Arrange
         $parser = new ObjectParser([
-            'foo' => new StringParser(),
-            'bar' => (new StringParser())->optional(),
+            'foo' => new StringParser,
+            'bar' => (new StringParser)->optional(),
         ]);
         $data = json_decode('{"foo": "hello"}');
 
@@ -68,12 +68,12 @@ class ObjectParserTest extends TestCase
         $this->assertArrayNotHasKey('bar', $result);
     }
 
-    public function testOptionalFieldIncludedWhenPresent(): void
+    public function test_optional_field_included_when_present(): void
     {
         // Arrange
         $parser = new ObjectParser([
-            'foo' => new StringParser(),
-            'bar' => (new StringParser())->optional(),
+            'foo' => new StringParser,
+            'bar' => (new StringParser)->optional(),
         ]);
         $data = json_decode('{"foo": "hello", "bar": "world"}');
 
@@ -84,7 +84,7 @@ class ObjectParserTest extends TestCase
         $this->assertSame(['foo' => 'hello', 'bar' => 'world'], $result);
     }
 
-    public function testOptionalFieldThrowsWhenPresentButInvalid(): void
+    public function test_optional_field_throws_when_present_but_invalid(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -92,7 +92,7 @@ class ObjectParserTest extends TestCase
 
         // Arrange
         $parser = new ObjectParser([
-            'foo' => (new StringParser())->optional(),
+            'foo' => (new StringParser)->optional(),
         ]);
         $data = json_decode('{"foo": 123}');
 
@@ -103,7 +103,7 @@ class ObjectParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testOptionalFieldThrowsWhenPresentNullOnNonNullableInner(): void
+    public function test_optional_field_throws_when_present_null_on_non_nullable_inner(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -111,7 +111,7 @@ class ObjectParserTest extends TestCase
 
         // Arrange
         $parser = new ObjectParser([
-            'foo' => (new StringParser())->optional(),
+            'foo' => (new StringParser)->optional(),
         ]);
         $data = json_decode('{"foo": null}');
 
@@ -122,11 +122,11 @@ class ObjectParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testNullableOptionalFieldAcceptsAbsentNullAndValue(): void
+    public function test_nullable_optional_field_accepts_absent_null_and_value(): void
     {
         // Arrange
         $parser = new ObjectParser([
-            'foo' => (new StringParser())->nullable()->optional(),
+            'foo' => (new StringParser)->nullable()->optional(),
         ]);
 
         // Act + Assert
@@ -135,7 +135,7 @@ class ObjectParserTest extends TestCase
         $this->assertSame(['foo' => 'hi'], $parser->parse(json_decode('{"foo": "hi"}')));
     }
 
-    public function testRequiredFieldStillFailsWhenOptionalFieldsAlsoAbsent(): void
+    public function test_required_field_still_fails_when_optional_fields_also_absent(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -143,8 +143,8 @@ class ObjectParserTest extends TestCase
 
         // Arrange
         $parser = new ObjectParser([
-            'foo' => new StringParser(),
-            'bar' => (new StringParser())->optional(),
+            'foo' => new StringParser,
+            'bar' => (new StringParser)->optional(),
         ]);
         $data = json_decode('{}');
 

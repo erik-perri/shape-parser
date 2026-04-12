@@ -9,17 +9,18 @@ use Sourcetoad\ShapeParser\ParserContract;
 
 /**
  * @template T
+ *
  * @extends BaseParser<T>
  */
 final readonly class UnionParser extends BaseParser
 {
     /**
-     * @var array<int, ParserContract<T>> $parsers
+     * @var array<int, ParserContract<T>>
      */
     private array $parsers;
 
     /**
-     * @param ParserContract<T> ...$parser
+     * @param  ParserContract<T>  ...$parser
      */
     public function __construct(ParserContract ...$parser)
     {

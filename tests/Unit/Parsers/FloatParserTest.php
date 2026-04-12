@@ -13,10 +13,10 @@ use Sourcetoad\ShapeParser\Parsers\FloatParser;
 #[CoversClass(FloatParser::class)]
 class FloatParserTest extends TestCase
 {
-    public function testParseReturnsFloatResult(): void
+    public function test_parse_returns_float_result(): void
     {
         // Arrange
-        $parser = new FloatParser();
+        $parser = new FloatParser;
         $data = json_decode('1.5');
 
         // Act
@@ -27,14 +27,14 @@ class FloatParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function testParseThrowsWhenInvalid(string $json, string $expectedMessage): void
+    public function test_parse_throws_when_invalid(string $json, string $expectedMessage): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         // Arrange
-        $parser = new FloatParser();
+        $parser = new FloatParser;
         $data = json_decode($json);
 
         // Act

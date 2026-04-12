@@ -45,7 +45,7 @@ class NullableReturnTypeExtension implements DynamicMethodReturnTypeExtension
 
     private function resolveGenericParam(Type $type, string $ancestorClass): ?Type
     {
-        if (!method_exists($type, 'getAncestorWithClassName')) {
+        if (! method_exists($type, 'getAncestorWithClassName')) {
             return null;
         }
 
@@ -53,7 +53,7 @@ class NullableReturnTypeExtension implements DynamicMethodReturnTypeExtension
         // @phpstan-ignore phpstanApi.varTagAssumption
         $ancestor = $type->getAncestorWithClassName($ancestorClass);
 
-        if ($ancestor === null || !method_exists($ancestor, 'getTypes')) {
+        if ($ancestor === null || ! method_exists($ancestor, 'getTypes')) {
             return null;
         }
 

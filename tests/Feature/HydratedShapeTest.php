@@ -11,7 +11,7 @@ use Sourcetoad\ShapeParser\ShapeFactory;
 #[CoversNothing]
 class HydratedShapeTest extends TestCase
 {
-    public function testDiscriminatedUnionHydratesPerVariantDto(): void
+    public function test_discriminated_union_hydrates_per_variant_dto(): void
     {
         // Arrange
         $data = [
@@ -42,26 +42,26 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list(
             $factory->discriminatedUnion('version', [
                 $factory->object([
                     'version' => $factory->literal(1),
                     'id' => $factory->integer(),
                     'title' => $factory->string(),
-                ])->transform(fn(array $a) => new ContentData($a['id'], $a['title'], null)),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], null)),
                 $factory->object([
                     'version' => $factory->literal(2),
                     'id' => $factory->integer(),
                     'title' => $factory->string(),
                     'url' => $factory->string(),
-                ])->transform(fn(array $a) => new ContentData($a['id'], $a['title'], $a['url'])),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['url'])),
                 $factory->object([
                     'version' => $factory->literal(3),
                     'id' => $factory->integer(),
                     'title' => $factory->string(),
                     'link' => $factory->string(),
-                ])->transform(fn(array $a) => new ContentData($a['id'], $a['title'], $a['link'])),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['link'])),
             ]),
         )->lenient();
 
@@ -88,7 +88,7 @@ class HydratedShapeTest extends TestCase
         $this->assertSame('https://example.com', $result[2]->url);
     }
 
-    public function testDiscriminatedUnionHydratesResultDto(): void
+    public function test_discriminated_union_hydrates_result_dto(): void
     {
         // Arrange
         $data = [
@@ -119,7 +119,7 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->list(
             $factory->discriminatedUnion('version', [
                 $factory->object([
@@ -139,13 +139,13 @@ class HydratedShapeTest extends TestCase
                     'title' => $factory->string(),
                     'link' => $factory->string(),
                 ]),
-            ])->transform(fn(array $parsed) => match ($parsed['version']) {
+            ])->transform(fn (array $parsed) => match ($parsed['version']) {
                 1 => new ContentData($parsed['id'], $parsed['title'], null),
                 2 => new ContentData($parsed['id'], $parsed['title'], $parsed['url']),
                 3 => new ContentData($parsed['id'], $parsed['title'], $parsed['link']),
             }),
         )
-        ->lenient();
+            ->lenient();
 
         // Act
         $result = $parser->parse($data);
@@ -170,7 +170,7 @@ class HydratedShapeTest extends TestCase
         $this->assertSame('https://example.com', $result[2]->url);
     }
 
-    public function testNestedDtoHydrationIsBottomUp(): void
+    public function test_nested_dto_hydration_is_bottom_up(): void
     {
         // Arrange
         $data = [
@@ -182,19 +182,19 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $factory = new ShapeFactory();
+        $factory = new ShapeFactory;
         $parser = $factory->object([
             'title' => $factory->string(),
             'author' => $factory->object([
                 'user_id' => $factory->integer(),
                 'first_name' => $factory->string(),
                 'created_at' => $factory->string(),
-            ])->transform(fn(array $a) => new UserDto(
+            ])->transform(fn (array $a) => new UserDto(
                 userId: $a['user_id'],
                 firstName: $a['first_name'],
                 createdAt: $a['created_at'],
             )),
-        ])->transform(fn(array $a) => new PostDto(
+        ])->transform(fn (array $a) => new PostDto(
             title: $a['title'],
             author: $a['author'],
         ));

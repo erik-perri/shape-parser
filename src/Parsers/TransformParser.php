@@ -11,13 +11,14 @@ use Sourcetoad\ShapeParser\ParserContract;
 /**
  * @template TIn
  * @template TOut
+ *
  * @extends BaseParser<TOut>
  */
 final readonly class TransformParser extends BaseParser
 {
     /**
-     * @param ParserContract<TIn> $parser
-     * @param Closure(TIn): TOut $fn
+     * @param  ParserContract<TIn>  $parser
+     * @param  Closure(TIn): TOut  $fn
      */
     public function __construct(
         public ParserContract $parser,
@@ -33,6 +34,7 @@ final readonly class TransformParser extends BaseParser
 
     /**
      * @return TOut
+     *
      * @throws ParseException
      */
     public function parse(mixed $data): mixed

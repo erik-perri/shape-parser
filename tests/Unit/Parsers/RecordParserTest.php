@@ -16,11 +16,11 @@ use Sourcetoad\ShapeParser\Parsers\UnionParser;
 #[CoversClass(RecordParser::class)]
 class RecordParserTest extends TestCase
 {
-    public function testParseReturnsResult(): void
+    public function test_parse_returns_result(): void
     {
         // Arrange
-        $parser = new RecordParser(new StringParser(), new ObjectParser([
-            'foo' => new StringParser(),
+        $parser = new RecordParser(new StringParser, new ObjectParser([
+            'foo' => new StringParser,
         ]));
         $data = json_decode('{"a": {"foo": "bar"}, "b": {"foo": "baz"}}');
 
@@ -31,11 +31,11 @@ class RecordParserTest extends TestCase
         $this->assertSame(['a' => ['foo' => 'bar'], 'b' => ['foo' => 'baz']], $result);
     }
 
-    public function testParseHandlesUnions(): void
+    public function test_parse_handles_unions(): void
     {
         // Arrange
-        $parser = new RecordParser(new StringParser(), new ObjectParser([
-            'foo' => new UnionParser(new StringParser(), new IntegerParser()),
+        $parser = new RecordParser(new StringParser, new ObjectParser([
+            'foo' => new UnionParser(new StringParser, new IntegerParser),
         ]));
         $data = json_decode('{"a": {"foo": "bar"}, "b": {"foo": 123}}');
 
@@ -46,15 +46,15 @@ class RecordParserTest extends TestCase
         $this->assertSame(['a' => ['foo' => 'bar'], 'b' => ['foo' => 123]], $result);
     }
 
-    public function testParseThrowsWhenKeysAreWrongType(): void
+    public function test_parse_throws_when_keys_are_wrong_type(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Failed to parse record');
 
         // Arrange
-        $parser = new RecordParser(new StringParser(), new ObjectParser([
-            'foo' => new StringParser(),
+        $parser = new RecordParser(new StringParser, new ObjectParser([
+            'foo' => new StringParser,
         ]));
         $data = json_decode('{"0": {"foo": "bar"}, "1": {"foo": "baz"}}');
 
@@ -65,14 +65,14 @@ class RecordParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testParseThrowsWhenTypeIsWrong(): void
+    public function test_parse_throws_when_type_is_wrong(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Expected record<string, string>, got string');
 
         // Arrange
-        $parser = new RecordParser(new StringParser(), new StringParser());
+        $parser = new RecordParser(new StringParser, new StringParser);
         $data = json_decode('"foo"');
 
         // Act

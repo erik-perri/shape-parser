@@ -16,6 +16,7 @@ interface ParserContract
 
     /**
      * @return T
+     *
      * @throws ParseException
      */
     public function parse(mixed $data): mixed;

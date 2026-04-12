@@ -10,6 +10,7 @@ use Sourcetoad\ShapeParser\ParserContract;
 
 /**
  * @template T
+ *
  * @implements ParserContract<T>
  */
 abstract readonly class BaseParser implements ParserContract
@@ -53,7 +54,8 @@ abstract readonly class BaseParser implements ParserContract
 
     /**
      * @template U
-     * @param callable(T): U $fn
+     *
+     * @param  callable(T): U  $fn
      * @return TransformParser<T, U>
      */
     public function transform(callable $fn): TransformParser

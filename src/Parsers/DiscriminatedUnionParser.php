@@ -11,18 +11,18 @@ use stdClass;
 
 /**
  * @template T
+ *
  * @extends BaseParser<T>
  */
 final readonly class DiscriminatedUnionParser extends BaseParser
 {
     /**
-     * @var array<string|int, ParserContract<T>> $map
+     * @var array<string|int, ParserContract<T>>
      */
     private array $map;
 
     /**
-     * @param string $discriminator
-     * @param list<ParserContract<T>> $parsers
+     * @param  list<ParserContract<T>>  $parsers
      */
     public function __construct(
         private string $discriminator,
@@ -43,7 +43,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser
 
             $fieldParser = $objectParser->shape[$discriminator] ?? null;
 
-            if (!$fieldParser instanceof LiteralParser) {
+            if (! $fieldParser instanceof LiteralParser) {
                 throw new InvalidArgumentException(sprintf(
                     'ObjectParser at index %d must have a LiteralParser for the "%s" field, got %s',
                     $i,
@@ -54,7 +54,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser
 
             $tagValue = $fieldParser->literal;
 
-            if (!is_string($tagValue) && !is_int($tagValue)) {
+            if (! is_string($tagValue) && ! is_int($tagValue)) {
                 throw new InvalidArgumentException(sprintf(
                     'Discriminator literal at index %d must be a string or int, got %s',
                     $i,
@@ -77,7 +77,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser
     }
 
     /**
-     * @param ParserContract<mixed> $parser
+     * @param  ParserContract<mixed>  $parser
      * @return ObjectParser<array<mixed>>|null
      */
     private function unwrapToObject(ParserContract $parser): ?ObjectParser
@@ -96,13 +96,13 @@ final readonly class DiscriminatedUnionParser extends BaseParser
 
     public function parse(mixed $data): mixed
     {
-        if (!is_array($data) && !($data instanceof stdClass)) {
+        if (! is_array($data) && ! ($data instanceof stdClass)) {
             throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
-        if (!array_key_exists($this->discriminator, $data)) {
+        if (! array_key_exists($this->discriminator, $data)) {
             throw new ParseException(sprintf(
                 'Missing discriminator key "%s" in: %s',
                 $this->discriminator,
@@ -112,7 +112,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser
 
         $tagValue = $data[$this->discriminator];
 
-        if (!is_string($tagValue) && !is_int($tagValue)) {
+        if (! is_string($tagValue) && ! is_int($tagValue)) {
             throw new ParseException(sprintf(
                 'Discriminator value for "%s" must be string or int, got %s',
                 $this->discriminator,
@@ -120,7 +120,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser
             ));
         }
 
-        if (!isset($this->map[$tagValue])) {
+        if (! isset($this->map[$tagValue])) {
             $allowed = implode(', ', array_keys($this->map));
 
             throw new ParseException(sprintf('Unknown tag "%s". Expected one of: %s', $tagValue, $allowed));

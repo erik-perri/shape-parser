@@ -11,12 +11,13 @@ use stdClass;
 
 /**
  * @template T of mixed
+ *
  * @extends BaseParser<list<T>>
  */
 final readonly class LenientListParser extends BaseParser
 {
     /**
-     * @param ParserContract<T> $parser
+     * @param  ParserContract<T>  $parser
      */
     public function __construct(
         private ParserContract $parser,
@@ -30,19 +31,19 @@ final readonly class LenientListParser extends BaseParser
     }
 
     /**
-     * @param mixed $data
      * @return list<T>
+     *
      * @throws ParseException
      */
     public function parse(mixed $data): array
     {
-        if (!is_array($data) && !($data instanceof stdClass)) {
+        if (! is_array($data) && ! ($data instanceof stdClass)) {
             throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
-        if (!array_is_list($data)) {
+        if (! array_is_list($data)) {
             throw new ParseException(sprintf(
                 'Expected %s, got array with keys: %s',
                 $this->describe(),

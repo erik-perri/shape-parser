@@ -10,13 +10,14 @@ use Sourcetoad\ShapeParser\ParserContract;
 
 /**
  * @template T
+ *
  * @implements ParserContract<T>
  */
 final readonly class FallbackParser implements ParserContract
 {
     /**
-     * @param ParserContract<T> $parser
-     * @param T $fallback
+     * @param  ParserContract<T>  $parser
+     * @param  T  $fallback
      */
     public function __construct(
         private ParserContract $parser,

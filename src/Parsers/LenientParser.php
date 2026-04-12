@@ -9,12 +9,13 @@ use Sourcetoad\ShapeParser\ParserContract;
 
 /**
  * @template T
+ *
  * @extends BaseParser<T|null>
  */
 final readonly class LenientParser extends BaseParser
 {
     /**
-     * @param ParserContract<T> $parser
+     * @param  ParserContract<T>  $parser
      */
     public function __construct(
         private ParserContract $parser,

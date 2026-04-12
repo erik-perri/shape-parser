@@ -12,10 +12,10 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(StringParser::class)]
 class StringParserTest extends TestCase
 {
-    public function testParseReturnsResult(): void
+    public function test_parse_returns_result(): void
     {
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $data = json_decode('"foo"');
 
         // Act
@@ -25,14 +25,14 @@ class StringParserTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function testParseThrowsWhenInvalid(): void
+    public function test_parse_throws_when_invalid(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Expected string, got int');
 
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $data = json_decode('123');
 
         // Act

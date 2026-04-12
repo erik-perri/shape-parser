@@ -20,7 +20,7 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class OptionalParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParse(ParserContract $inner, mixed $input, mixed $expected): void
+    public function test_parse(ParserContract $inner, mixed $input, mixed $expected): void
     {
         // Arrange
         $parser = $inner->optional();
@@ -39,22 +39,22 @@ class OptionalParserTest extends TestCase
     {
         return [
             'string valid' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => 'hello',
                 'expected' => 'hello',
             ],
             'integer valid' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'input' => 42,
                 'expected' => 42,
             ],
             'boolean valid' => [
-                'inner' => new BooleanParser(),
+                'inner' => new BooleanParser,
                 'input' => true,
                 'expected' => true,
             ],
             'nullable inner with null' => [
-                'inner' => (new StringParser())->nullable(),
+                'inner' => (new StringParser)->nullable(),
                 'input' => null,
                 'expected' => null,
             ],
@@ -62,7 +62,7 @@ class OptionalParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function testParseThrowsOnInvalidInput(ParserContract $inner, mixed $input): void
+    public function test_parse_throws_on_invalid_input(ParserContract $inner, mixed $input): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -84,22 +84,22 @@ class OptionalParserTest extends TestCase
     {
         return [
             'string given int' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => 123,
             ],
             'string given null' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => null,
             ],
             'integer given string' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'input' => 'hello',
             ],
         ];
     }
 
     #[DataProvider('describeCasesProvider')]
-    public function testDescribe(ParserContract $inner, string $expected): void
+    public function test_describe(ParserContract $inner, string $expected): void
     {
         // Arrange
         $parser = $inner->optional();
@@ -118,28 +118,28 @@ class OptionalParserTest extends TestCase
     {
         return [
             'string' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'expected' => 'optional<string>',
             ],
             'nullable integer' => [
-                'inner' => (new IntegerParser())->nullable(),
+                'inner' => (new IntegerParser)->nullable(),
                 'expected' => 'optional<nullable<int>>',
             ],
             'list of string' => [
-                'inner' => new ListParser(new StringParser()),
+                'inner' => new ListParser(new StringParser),
                 'expected' => 'optional<list<string>>',
             ],
         ];
     }
 
-    public function testDoubleOptionalThrows(): void
+    public function test_double_optional_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call optional() on an already optional parser.');
 
         // Arrange
-        $parser = (new StringParser())->optional();
+        $parser = (new StringParser)->optional();
 
         // Act
         $parser->optional();
@@ -148,14 +148,14 @@ class OptionalParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testNullableAfterOptionalThrows(): void
+    public function test_nullable_after_optional_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call nullable() on an optional parser');
 
         // Arrange
-        $parser = (new StringParser())->optional();
+        $parser = (new StringParser)->optional();
 
         // Act
         $parser->nullable();
@@ -164,14 +164,14 @@ class OptionalParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testLenientAfterOptionalThrows(): void
+    public function test_lenient_after_optional_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call lenient() on an optional parser');
 
         // Arrange
-        $parser = (new StringParser())->optional();
+        $parser = (new StringParser)->optional();
 
         // Act
         $parser->lenient();
@@ -180,17 +180,17 @@ class OptionalParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testTransformAfterOptionalThrows(): void
+    public function test_transform_after_optional_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call transform() on an optional parser');
 
         // Arrange
-        $parser = (new StringParser())->optional();
+        $parser = (new StringParser)->optional();
 
         // Act
-        $parser->transform(fn(string $s): string => $s);
+        $parser->transform(fn (string $s): string => $s);
 
         // Assert
         // No assertions, only expectations.

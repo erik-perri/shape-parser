@@ -17,7 +17,7 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class FallbackParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParse(ParserContract $inner, mixed $fallback, mixed $input, mixed $expected): void
+    public function test_parse(ParserContract $inner, mixed $fallback, mixed $input, mixed $expected): void
     {
         // Arrange
         $fallbackParser = $inner->lenient()->fallback($fallback);
@@ -36,19 +36,19 @@ class FallbackParserTest extends TestCase
     {
         return [
             'string success' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'fallback' => 'fallback',
                 'input' => 'hello',
                 'expected' => 'hello',
             ],
             'string failure' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'fallback' => 'fallback',
                 'input' => 123,
                 'expected' => 'fallback',
             ],
             'integer failure' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'fallback' => 0,
                 'input' => 'not an int',
                 'expected' => 0,
@@ -57,10 +57,10 @@ class FallbackParserTest extends TestCase
     }
 
     #[DataProvider('safeParseCasesProvider')]
-    public function testSafeParseReturnsSuccess(mixed $input, mixed $expected): void
+    public function test_safe_parse_returns_success(mixed $input, mixed $expected): void
     {
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $fallbackParser = $parser->lenient()->fallback('fallback');
 
         // Act
@@ -90,7 +90,7 @@ class FallbackParserTest extends TestCase
     }
 
     #[DataProvider('describeCasesProvider')]
-    public function testDescribe(ParserContract $inner, mixed $fallback, string $expected): void
+    public function test_describe(ParserContract $inner, mixed $fallback, string $expected): void
     {
         // Arrange
         $fallbackParser = $inner->lenient()->fallback($fallback);
@@ -109,22 +109,22 @@ class FallbackParserTest extends TestCase
     {
         return [
             'string fallback' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'fallback' => 'fallback',
                 'expected' => "fallback<string, 'fallback'>",
             ],
             'integer fallback' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'fallback' => 42,
                 'expected' => 'fallback<int, 42>',
             ],
             'boolean fallback' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'fallback' => false,
                 'expected' => 'fallback<string, false>',
             ],
             'complex fallback' => [
-                'inner' => new ObjectParser(['name' => new StringParser()]),
+                'inner' => new ObjectParser(['name' => new StringParser]),
                 'fallback' => ['name' => 'unknown'],
                 'expected' => 'fallback<object, array>',
             ],

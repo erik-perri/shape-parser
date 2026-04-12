@@ -8,9 +8,9 @@ use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\FloatParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
-use Sourcetoad\ShapeParser\Parsers\NumberParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
+use Sourcetoad\ShapeParser\Parsers\NumberParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
@@ -20,8 +20,8 @@ class ShapeFactory
 {
     /**
      * @template T
-     * @param string $discriminator
-     * @param list<ParserContract<T>> $parsers
+     *
+     * @param  list<ParserContract<T>>  $parsers
      * @return DiscriminatedUnionParser<T>
      */
     public function discriminatedUnion(string $discriminator, array $parsers): DiscriminatedUnionParser
@@ -31,22 +31,23 @@ class ShapeFactory
 
     public function boolean(): BooleanParser
     {
-        return new BooleanParser();
+        return new BooleanParser;
     }
 
     public function float(): FloatParser
     {
-        return new FloatParser();
+        return new FloatParser;
     }
 
     public function integer(): IntegerParser
     {
-        return new IntegerParser();
+        return new IntegerParser;
     }
 
     /**
      * @template T of bool|int|string
-     * @param T $literal
+     *
+     * @param  T  $literal
      * @return LiteralParser<T>
      */
     public function literal(bool|int|string $literal): LiteralParser
@@ -56,7 +57,8 @@ class ShapeFactory
 
     /**
      * @template T
-     * @param ParserContract<T> $parser
+     *
+     * @param  ParserContract<T>  $parser
      * @return ListParser<T>
      */
     public function list(ParserContract $parser): ListParser
@@ -66,11 +68,11 @@ class ShapeFactory
 
     public function number(): NumberParser
     {
-        return new NumberParser();
+        return new NumberParser;
     }
 
     /**
-     * @param array<string, ParserContract<mixed>> $shape
+     * @param  array<string, ParserContract<mixed>>  $shape
      * @return ObjectParser<array<array-key, mixed>>
      */
     public function object(array $shape): ObjectParser
@@ -81,8 +83,9 @@ class ShapeFactory
     /**
      * @template K of array-key
      * @template T
-     * @param ParserContract<K> $keyParser
-     * @param ParserContract<T> $valueParser
+     *
+     * @param  ParserContract<K>  $keyParser
+     * @param  ParserContract<T>  $valueParser
      * @return RecordParser<K, T>
      */
     public function record(ParserContract $keyParser, ParserContract $valueParser): RecordParser
@@ -92,12 +95,13 @@ class ShapeFactory
 
     public function string(): StringParser
     {
-        return new StringParser();
+        return new StringParser;
     }
 
     /**
      * @template T
-     * @param ParserContract<T> ...$parsers
+     *
+     * @param  ParserContract<T>  ...$parsers
      * @return UnionParser<T>
      */
     public function union(ParserContract ...$parsers): UnionParser

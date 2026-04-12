@@ -12,7 +12,7 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
 final readonly class ParseResultData
 {
     /**
-     * @param T $data
+     * @param  T  $data
      */
     public function __construct(
         public bool $success,

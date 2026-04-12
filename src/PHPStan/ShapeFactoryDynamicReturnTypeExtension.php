@@ -82,7 +82,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
 
         foreach ($constantArrays as $constantArray) {
             foreach ($constantArray->getValueTypes() as $valueType) {
-                if (!method_exists($valueType, 'getAncestorWithClassName')) {
+                if (! method_exists($valueType, 'getAncestorWithClassName')) {
                     continue;
                 }
 
@@ -90,7 +90,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
                 // @phpstan-ignore phpstanApi.varTagAssumption
                 $ancestor = $valueType->getAncestorWithClassName(ObjectParser::class);
 
-                if ($ancestor === null || !method_exists($ancestor, 'getTypes')) {
+                if ($ancestor === null || ! method_exists($ancestor, 'getTypes')) {
                     continue;
                 }
 
@@ -172,7 +172,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
 
     private function resolveParserContractGeneric(Type $parserType): ?Type
     {
-        if (!method_exists($parserType, 'getAncestorWithClassName')) {
+        if (! method_exists($parserType, 'getAncestorWithClassName')) {
             return null;
         }
 
@@ -180,7 +180,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         // @phpstan-ignore phpstanApi.varTagAssumption
         $ancestor = $parserType->getAncestorWithClassName(ParserContract::class);
 
-        if ($ancestor === null || !method_exists($ancestor, 'getTypes')) {
+        if ($ancestor === null || ! method_exists($ancestor, 'getTypes')) {
             return null;
         }
 

@@ -78,13 +78,13 @@ class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
         }
 
         return new GenericObjectType(LenientParser::class, [
-            TypeCombinator::union($genericType, new NullType()),
+            TypeCombinator::union($genericType, new NullType),
         ]);
     }
 
     private function isSubtypeOf(Type $type, string $className): bool
     {
-        if (!method_exists($type, 'getAncestorWithClassName')) {
+        if (! method_exists($type, 'getAncestorWithClassName')) {
             return false;
         }
 
@@ -93,7 +93,7 @@ class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
 
     private function resolveGenericParam(Type $type, string $ancestorClass): ?Type
     {
-        if (!method_exists($type, 'getAncestorWithClassName')) {
+        if (! method_exists($type, 'getAncestorWithClassName')) {
             return null;
         }
 
@@ -101,7 +101,7 @@ class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
         // @phpstan-ignore phpstanApi.varTagAssumption
         $ancestor = $type->getAncestorWithClassName($ancestorClass);
 
-        if ($ancestor === null || !method_exists($ancestor, 'getTypes')) {
+        if ($ancestor === null || ! method_exists($ancestor, 'getTypes')) {
             return null;
         }
 

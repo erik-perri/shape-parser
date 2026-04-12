@@ -18,7 +18,7 @@ final readonly class BooleanParser extends BaseParser
 
     public function parse(mixed $data): bool
     {
-        if (!is_bool($data)) {
+        if (! is_bool($data)) {
             throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 

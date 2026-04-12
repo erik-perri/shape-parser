@@ -13,10 +13,10 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 #[CoversClass(LenientParser::class)]
 class LenientParserTest extends TestCase
 {
-    public function testParseReturnsResultOnSuccess(): void
+    public function test_parse_returns_result_on_success(): void
     {
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $lenientParser = $parser->lenient();
 
         // Act
@@ -26,10 +26,10 @@ class LenientParserTest extends TestCase
         $this->assertSame('hello', $result);
     }
 
-    public function testParseReturnsNullOnFailure(): void
+    public function test_parse_returns_null_on_failure(): void
     {
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $lenientParser = $parser->lenient();
 
         // Act
@@ -39,10 +39,10 @@ class LenientParserTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testDescribeReturnsLenientWrappedDescription(): void
+    public function test_describe_returns_lenient_wrapped_description(): void
     {
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $lenientParser = $parser->lenient();
 
         // Act
@@ -52,14 +52,14 @@ class LenientParserTest extends TestCase
         $this->assertSame('lenient<string>', $description);
     }
 
-    public function testDoubleLenientThrows(): void
+    public function test_double_lenient_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call lenient() on an already lenient parser.');
 
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $lenientParser = $parser->lenient();
 
         // Act
@@ -69,14 +69,14 @@ class LenientParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testNullableAfterLenientThrows(): void
+    public function test_nullable_after_lenient_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call nullable() on an already lenient parser.');
 
         // Arrange
-        $parser = new StringParser();
+        $parser = new StringParser;
         $lenientParser = $parser->lenient();
 
         // Act

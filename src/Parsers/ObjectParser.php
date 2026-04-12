@@ -11,12 +11,13 @@ use stdClass;
 
 /**
  * @template T of array<mixed>
+ *
  * @extends BaseParser<T>
  */
 final readonly class ObjectParser extends BaseParser
 {
     /**
-     * @param array<string, ParserContract<mixed>> $shape
+     * @param  array<string, ParserContract<mixed>>  $shape
      */
     public function __construct(
         public array $shape,
@@ -31,13 +32,13 @@ final readonly class ObjectParser extends BaseParser
     }
 
     /**
-     * @param mixed $data
      * @return T
+     *
      * @throws ParseException
      */
     public function parse(mixed $data): array
     {
-        if (!is_array($data) && !($data instanceof stdClass)) {
+        if (! is_array($data) && ! ($data instanceof stdClass)) {
             throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
@@ -46,12 +47,13 @@ final readonly class ObjectParser extends BaseParser
         $errors = [];
 
         foreach ($this->shape as $key => $parser) {
-            if (!array_key_exists($key, $data)) {
+            if (! array_key_exists($key, $data)) {
                 if ($parser instanceof OptionalParser) {
                     continue;
                 }
 
                 $errors[$key] = new ParseError("Missing required field: $key");
+
                 continue;
             }
 
@@ -62,7 +64,7 @@ final readonly class ObjectParser extends BaseParser
             }
         }
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             // TODO Better error reporting
             throw new ParseException('Failed to parse object');
         }

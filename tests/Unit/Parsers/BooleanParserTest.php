@@ -14,10 +14,10 @@ use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 class BooleanParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParseReturnsResult(string $json, bool $expected): void
+    public function test_parse_returns_result(string $json, bool $expected): void
     {
         // Arrange
-        $parser = new BooleanParser();
+        $parser = new BooleanParser;
         $data = json_decode($json);
 
         // Act
@@ -44,14 +44,14 @@ class BooleanParserTest extends TestCase
         ];
     }
 
-    public function testParseThrowsWhenInvalid(): void
+    public function test_parse_throws_when_invalid(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Expected bool, got int');
 
         // Arrange
-        $parser = new BooleanParser();
+        $parser = new BooleanParser;
         $data = json_decode('1');
 
         // Act

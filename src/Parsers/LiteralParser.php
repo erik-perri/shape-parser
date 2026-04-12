@@ -8,12 +8,13 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
 
 /**
  * @template T of bool|int|string
+ *
  * @extends BaseParser<T>
  */
 final readonly class LiteralParser extends BaseParser
 {
     /**
-     * @param T $literal
+     * @param  T  $literal
      */
     public function __construct(public bool|int|string $literal)
     {

@@ -20,7 +20,7 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class NullableParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParse(ParserContract $inner, mixed $input, mixed $expected): void
+    public function test_parse(ParserContract $inner, mixed $input, mixed $expected): void
     {
         // Arrange
         $parser = $inner->nullable();
@@ -39,32 +39,32 @@ class NullableParserTest extends TestCase
     {
         return [
             'string valid' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => 'hello',
                 'expected' => 'hello',
             ],
             'string null' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => null,
                 'expected' => null,
             ],
             'integer valid' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'input' => 42,
                 'expected' => 42,
             ],
             'integer null' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'input' => null,
                 'expected' => null,
             ],
             'boolean valid' => [
-                'inner' => new BooleanParser(),
+                'inner' => new BooleanParser,
                 'input' => true,
                 'expected' => true,
             ],
             'boolean null' => [
-                'inner' => new BooleanParser(),
+                'inner' => new BooleanParser,
                 'input' => null,
                 'expected' => null,
             ],
@@ -72,7 +72,7 @@ class NullableParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function testParseThrowsOnInvalidNonNull(ParserContract $inner, mixed $input): void
+    public function test_parse_throws_on_invalid_non_null(ParserContract $inner, mixed $input): void
     {
         // Expectations
         $this->expectException(ParseException::class);
@@ -94,22 +94,22 @@ class NullableParserTest extends TestCase
     {
         return [
             'string given int' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'input' => 123,
             ],
             'integer given string' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'input' => 'hello',
             ],
             'boolean given string' => [
-                'inner' => new BooleanParser(),
+                'inner' => new BooleanParser,
                 'input' => 'not-a-bool',
             ],
         ];
     }
 
     #[DataProvider('describeCasesProvider')]
-    public function testDescribe(ParserContract $inner, string $expected): void
+    public function test_describe(ParserContract $inner, string $expected): void
     {
         // Arrange
         $parser = $inner->nullable();
@@ -128,28 +128,28 @@ class NullableParserTest extends TestCase
     {
         return [
             'string' => [
-                'inner' => new StringParser(),
+                'inner' => new StringParser,
                 'expected' => 'nullable<string>',
             ],
             'integer' => [
-                'inner' => new IntegerParser(),
+                'inner' => new IntegerParser,
                 'expected' => 'nullable<int>',
             ],
             'list of string' => [
-                'inner' => new ListParser(new StringParser()),
+                'inner' => new ListParser(new StringParser),
                 'expected' => 'nullable<list<string>>',
             ],
         ];
     }
 
-    public function testDoubleNullableThrows(): void
+    public function test_double_nullable_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call nullable() on an already nullable parser.');
 
         // Arrange
-        $parser = (new StringParser())->nullable();
+        $parser = (new StringParser)->nullable();
 
         // Act
         $parser->nullable();
@@ -158,10 +158,10 @@ class NullableParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testNullableLenientChainIsAllowed(): void
+    public function test_nullable_lenient_chain_is_allowed(): void
     {
         // Arrange
-        $parser = (new StringParser())->nullable()->lenient();
+        $parser = (new StringParser)->nullable()->lenient();
 
         // Act + Assert
         $this->assertNull($parser->parse(null));

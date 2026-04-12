@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
@@ -18,10 +19,10 @@ use Sourcetoad\ShapeParser\Parsers\TransformParser;
 #[CoversClass(TransformParser::class)]
 class TransformParserTest extends TestCase
 {
-    public function testParseAppliesClosureToInnerResult(): void
+    public function test_parse_applies_closure_to_inner_result(): void
     {
         // Arrange
-        $parser = (new StringParser())->transform(fn(string $s) => strtoupper($s));
+        $parser = (new StringParser)->transform(fn (string $s) => strtoupper($s));
 
         // Act
         $result = $parser->parse('hello');
@@ -30,11 +31,11 @@ class TransformParserTest extends TestCase
         $this->assertSame('HELLO', $result);
     }
 
-    public function testParseCanProduceObjectFromPrimitive(): void
+    public function test_parse_can_produce_object_from_primitive(): void
     {
         // Arrange
-        $parser = (new StringParser())->transform(
-            fn(string $s) => new DateTimeImmutable($s),
+        $parser = (new StringParser)->transform(
+            fn (string $s) => new DateTimeImmutable($s),
         );
 
         // Act
@@ -45,13 +46,13 @@ class TransformParserTest extends TestCase
         $this->assertSame('2026-04-12', $result->format('Y-m-d'));
     }
 
-    public function testParseHydratesDtoFromObjectShape(): void
+    public function test_parse_hydrates_dto_from_object_shape(): void
     {
         // Arrange
         $parser = (new ObjectParser([
-            'id' => new IntegerParser(),
-            'title' => new StringParser(),
-        ]))->transform(fn(array $a) => new TransformParserSampleDto($a['id'], $a['title']));
+            'id' => new IntegerParser,
+            'title' => new StringParser,
+        ]))->transform(fn (array $a) => new TransformParserSampleDto($a['id'], $a['title']));
 
         // Act
         $result = $parser->parse(['id' => 1, 'title' => 'Foo']);
@@ -62,13 +63,13 @@ class TransformParserTest extends TestCase
         $this->assertSame('Foo', $result->title);
     }
 
-    public function testParseThrowsParseExceptionFromInnerParser(): void
+    public function test_parse_throws_parse_exception_from_inner_parser(): void
     {
         // Expectations
         $this->expectException(ParseException::class);
 
         // Arrange
-        $parser = (new StringParser())->transform(fn(string $s) => strtoupper($s));
+        $parser = (new StringParser)->transform(fn (string $s) => strtoupper($s));
 
         // Act
         $parser->parse(123);
@@ -77,14 +78,14 @@ class TransformParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testParseDoesNotWrapClosureExceptions(): void
+    public function test_parse_does_not_wrap_closure_exceptions(): void
     {
         // Expectations
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('closure boom');
 
         // Arrange
-        $parser = (new StringParser())->transform(function (string $s): string {
+        $parser = (new StringParser)->transform(function (string $s): string {
             throw new RuntimeException('closure boom');
         });
 
@@ -95,12 +96,12 @@ class TransformParserTest extends TestCase
         // No assertions, only expectations.
     }
 
-    public function testChainedTransformComposesClosures(): void
+    public function test_chained_transform_composes_closures(): void
     {
         // Arrange
-        $parser = (new IntegerParser())
-            ->transform(fn(int $i) => $i + 1)
-            ->transform(fn(int $i) => $i * 10);
+        $parser = (new IntegerParser)
+            ->transform(fn (int $i) => $i + 1)
+            ->transform(fn (int $i) => $i * 10);
 
         // Act
         $result = $parser->parse(4);
@@ -109,14 +110,14 @@ class TransformParserTest extends TestCase
         $this->assertSame(50, $result);
     }
 
-    public function testLenientAfterTransformReturnsNullOnInnerFailure(): void
+    public function test_lenient_after_transform_returns_null_on_inner_failure(): void
     {
         // Arrange
         $parser = (new ObjectParser([
-            'id' => new IntegerParser(),
-            'title' => new StringParser(),
+            'id' => new IntegerParser,
+            'title' => new StringParser,
         ]))
-            ->transform(fn(array $a) => new TransformParserSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a) => new TransformParserSampleDto($a['id'], $a['title']))
             ->lenient();
 
         // Act
@@ -129,14 +130,14 @@ class TransformParserTest extends TestCase
         $this->assertSame(2, $good->id);
     }
 
-    public function testNullableAfterTransformReturnsNullOnNullInput(): void
+    public function test_nullable_after_transform_returns_null_on_null_input(): void
     {
         // Arrange
         $parser = (new ObjectParser([
-            'id' => new IntegerParser(),
-            'title' => new StringParser(),
+            'id' => new IntegerParser,
+            'title' => new StringParser,
         ]))
-            ->transform(fn(array $a) => new TransformParserSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a) => new TransformParserSampleDto($a['id'], $a['title']))
             ->nullable();
 
         // Act
@@ -148,15 +149,15 @@ class TransformParserTest extends TestCase
         $this->assertInstanceOf(TransformParserSampleDto::class, $dtoResult);
     }
 
-    public function testFallbackAfterLenientAfterTransformReturnsFallback(): void
+    public function test_fallback_after_lenient_after_transform_returns_fallback(): void
     {
         // Arrange
         $fallback = new TransformParserSampleDto(0, 'fallback');
         $parser = (new ObjectParser([
-            'id' => new IntegerParser(),
-            'title' => new StringParser(),
+            'id' => new IntegerParser,
+            'title' => new StringParser,
         ]))
-            ->transform(fn(array $a) => new TransformParserSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a) => new TransformParserSampleDto($a['id'], $a['title']))
             ->lenient()
             ->fallback($fallback);
 
@@ -167,10 +168,10 @@ class TransformParserTest extends TestCase
         $this->assertSame($fallback, $result);
     }
 
-    public function testDescribeChainsInnerDescription(): void
+    public function test_describe_chains_inner_description(): void
     {
         // Arrange
-        $parser = (new StringParser())->transform(fn(string $s) => $s);
+        $parser = (new StringParser)->transform(fn (string $s) => $s);
 
         // Act
         $description = $parser->describe();
@@ -179,20 +180,20 @@ class TransformParserTest extends TestCase
         $this->assertSame('transform<string>', $description);
     }
 
-    public function testTransformInsideDiscriminatedUnionVariant(): void
+    public function test_transform_inside_discriminated_union_variant(): void
     {
         // Arrange
         $v1 = (new ObjectParser([
             'version' => new LiteralParser(1),
-            'title' => new StringParser(),
-        ]))->transform(fn(array $a) => new TransformParserSampleDto(1, $a['title']));
+            'title' => new StringParser,
+        ]))->transform(fn (array $a) => new TransformParserSampleDto(1, $a['title']));
 
         $v2 = (new ObjectParser([
             'version' => new LiteralParser(2),
-            'title' => new StringParser(),
-        ]))->transform(fn(array $a) => new TransformParserSampleDto(2, $a['title']));
+            'title' => new StringParser,
+        ]))->transform(fn (array $a) => new TransformParserSampleDto(2, $a['title']));
 
-        $parser = new \Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser(
+        $parser = new DiscriminatedUnionParser(
             'version',
             [$v1, $v2],
         );
@@ -216,6 +217,5 @@ final readonly class TransformParserSampleDto
     public function __construct(
         public int $id,
         public string $title,
-    ) {
-    }
+    ) {}
 }

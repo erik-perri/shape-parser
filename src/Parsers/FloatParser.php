@@ -18,7 +18,7 @@ final readonly class FloatParser extends BaseParser
 
     public function parse(mixed $data): float
     {
-        if (!is_float($data)) {
+        if (! is_float($data)) {
             throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 

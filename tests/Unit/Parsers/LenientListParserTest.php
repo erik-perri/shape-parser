@@ -17,10 +17,10 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class LenientListParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function testParse(mixed $input, array $expected): void
+    public function test_parse(mixed $input, array $expected): void
     {
         // Arrange
-        $parser = new ListParser(new StringParser());
+        $parser = new ListParser(new StringParser);
         $lenientParser = $parser->lenient();
 
         // Act
@@ -52,13 +52,13 @@ class LenientListParserTest extends TestCase
     }
 
     #[DataProvider('invalidInputProvider')]
-    public function testParseThrowsWhenInputIsInvalid(mixed $input): void
+    public function test_parse_throws_when_input_is_invalid(mixed $input): void
     {
         // Expectations
         $this->expectException(ParseException::class);
 
         // Arrange
-        $parser = new ListParser(new StringParser());
+        $parser = new ListParser(new StringParser);
         $lenientParser = $parser->lenient();
 
         // Act
@@ -83,10 +83,10 @@ class LenientListParserTest extends TestCase
         ];
     }
 
-    public function testDescribeReturnsLenientWrappedDescription(): void
+    public function test_describe_returns_lenient_wrapped_description(): void
     {
         // Arrange
-        $parser = new ListParser(new StringParser());
+        $parser = new ListParser(new StringParser);
         $lenientParser = $parser->lenient();
 
         // Act
@@ -96,14 +96,14 @@ class LenientListParserTest extends TestCase
         $this->assertSame('lenient<list<string>>', $description);
     }
 
-    public function testDoubleLenientThrows(): void
+    public function test_double_lenient_throws(): void
     {
         // Expectations
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot call lenient() on an already lenient parser.');
 
         // Arrange
-        $parser = new ListParser(new StringParser());
+        $parser = new ListParser(new StringParser);
         $lenientParser = $parser->lenient();
 
         // Act
