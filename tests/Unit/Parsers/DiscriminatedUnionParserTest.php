@@ -6,8 +6,10 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
@@ -95,36 +97,34 @@ class DiscriminatedUnionParserTest extends TestCase
         $this->assertSame(50, $result);
     }
 
-    public function test_constructor_rejects_bare_string_parser_variant(): void
+    #[DataProvider('invalidVariantProvider')]
+    public function test_constructor_rejects_invalid_variant(ParserContract $variant): void
     {
         // Expectations
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must be an ObjectParser (optionally wrapped in TransformParser)');
 
         // Arrange + Act
-        new DiscriminatedUnionParser('type', [
-            new StringParser,
-        ]);
+        new DiscriminatedUnionParser('type', [$variant]);
 
         // Assert
         // No assertions, only expectations.
     }
 
-    public function test_constructor_rejects_nullable_object_parser_variant(): void
+    /**
+     * @return array<string, array{variant: ParserContract<mixed>}>
+     */
+    public static function invalidVariantProvider(): array
     {
-        // Expectations
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('must be an ObjectParser (optionally wrapped in TransformParser)');
-
-        // Arrange
-        $wrapped = (new ObjectParser([
-            'type' => new LiteralParser('foo'),
-        ]))->nullable();
-
-        // Act
-        new DiscriminatedUnionParser('type', [$wrapped]);
-
-        // Assert
-        // No assertions, only expectations.
+        return [
+            'bare string parser' => [
+                'variant' => new StringParser,
+            ],
+            'nullable object parser' => [
+                'variant' => (new ObjectParser([
+                    'type' => new LiteralParser('foo'),
+                ]))->nullable(),
+            ],
+        ];
     }
 }

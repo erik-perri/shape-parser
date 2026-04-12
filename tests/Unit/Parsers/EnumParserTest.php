@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Parsers\EnumParser;
@@ -14,78 +15,77 @@ use Sourcetoad\ShapeParser\Tests\Fixtures\StatusEnum;
 #[CoversClass(EnumParser::class)]
 class EnumParserTest extends TestCase
 {
-    public function test_parse_returns_backed_enum_case(): void
+    #[DataProvider('parseCasesProvider')]
+    public function test_parse_returns_enum_case(string $enumClass, mixed $input, mixed $expected): void
     {
         // Arrange
-        $parser = new EnumParser(StatusEnum::class);
-        $data = json_decode('"active"');
+        $parser = new EnumParser($enumClass);
 
         // Act
-        $result = $parser->parse($data);
+        $result = $parser->parse($input);
 
         // Assert
-        $this->assertSame(StatusEnum::Active, $result);
+        $this->assertSame($expected, $result);
     }
 
-    public function test_parse_returns_unit_enum_case(): void
+    /**
+     * @return array<string, array{enumClass: class-string, input: mixed, expected: mixed}>
+     */
+    public static function parseCasesProvider(): array
     {
-        // Arrange
-        $parser = new EnumParser(PriorityEnum::class);
-        $data = json_decode('"High"');
-
-        // Act
-        $result = $parser->parse($data);
-
-        // Assert
-        $this->assertSame(PriorityEnum::High, $result);
+        return [
+            'backed enum case' => [
+                'enumClass' => StatusEnum::class,
+                'input' => json_decode('"active"'),
+                'expected' => StatusEnum::Active,
+            ],
+            'unit enum case' => [
+                'enumClass' => PriorityEnum::class,
+                'input' => json_decode('"High"'),
+                'expected' => PriorityEnum::High,
+            ],
+        ];
     }
 
-    public function test_parse_throws_when_backed_value_unknown(): void
+    #[DataProvider('invalidCasesProvider')]
+    public function test_parse_throws_when_invalid(string $enumClass, mixed $input, string $expectedMessage): void
     {
         // Expectations
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Expected enum<%s>, got "unknown"', StatusEnum::class));
+        $this->expectExceptionMessage($expectedMessage);
 
         // Arrange
-        $parser = new EnumParser(StatusEnum::class);
+        $parser = new EnumParser($enumClass);
 
         // Act
-        $parser->parse('unknown');
+        $parser->parse($input);
 
         // Assert
         // No assertions, only expectations.
     }
 
-    public function test_parse_throws_when_unit_case_unknown(): void
+    /**
+     * @return array<string, array{enumClass: class-string, input: mixed, expectedMessage: string}>
+     */
+    public static function invalidCasesProvider(): array
     {
-        // Expectations
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Expected enum<%s>, got "Medium"', PriorityEnum::class));
-
-        // Arrange
-        $parser = new EnumParser(PriorityEnum::class);
-
-        // Act
-        $parser->parse('Medium');
-
-        // Assert
-        // No assertions, only expectations.
-    }
-
-    public function test_parse_throws_when_invalid_type(): void
-    {
-        // Expectations
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage(sprintf('Expected enum<%s>, got bool', StatusEnum::class));
-
-        // Arrange
-        $parser = new EnumParser(StatusEnum::class);
-
-        // Act
-        $parser->parse(true);
-
-        // Assert
-        // No assertions, only expectations.
+        return [
+            'backed value unknown' => [
+                'enumClass' => StatusEnum::class,
+                'input' => 'unknown',
+                'expectedMessage' => sprintf('Expected enum<%s>, got "unknown"', StatusEnum::class),
+            ],
+            'unit case unknown' => [
+                'enumClass' => PriorityEnum::class,
+                'input' => 'Medium',
+                'expectedMessage' => sprintf('Expected enum<%s>, got "Medium"', PriorityEnum::class),
+            ],
+            'wrong type' => [
+                'enumClass' => StatusEnum::class,
+                'input' => true,
+                'expectedMessage' => sprintf('Expected enum<%s>, got bool', StatusEnum::class),
+            ],
+        ];
     }
 
     public function test_describe(): void
