@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sourcetoad\ShapeParser;
 
 use Sourcetoad\ShapeParser\Parsers\BooleanParser;
+use Sourcetoad\ShapeParser\Parsers\DateTimeParser;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\EnumParser;
 use Sourcetoad\ShapeParser\Parsers\FloatParser;
@@ -33,6 +34,11 @@ class ShapeFactory
     public function boolean(): BooleanParser
     {
         return new BooleanParser;
+    }
+
+    public function dateTime(): DateTimeParser
+    {
+        return new DateTimeParser;
     }
 
     /**

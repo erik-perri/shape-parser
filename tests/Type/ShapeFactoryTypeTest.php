@@ -140,6 +140,21 @@ class ShapeFactoryTypeTest
         assertType('Sourcetoad\ShapeParser\Tests\Fixtures\StatusEnum', $result);
     }
 
+    public function testDateTime(): void
+    {
+        // Arrange
+        $data = json_decode('"2026-04-12T10:30:00Z"');
+
+        $factory = new ShapeFactory;
+        $parser = $factory->dateTime();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('DateTimeImmutable', $result);
+    }
+
     public function testRecord(): void
     {
         // Arrange
