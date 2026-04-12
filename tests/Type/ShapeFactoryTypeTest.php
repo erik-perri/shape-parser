@@ -6,11 +6,33 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Tests\Type;
 
+use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\ShapeFactory;
 use function PHPStan\Testing\assertType;
 
 class ShapeFactoryTypeTest
 {
+    public function testDiscriminatedUnion(): void
+    {
+        // Arrange
+        $data = json_decode('[{"type": "a", "foo": 1}, {"type": "b", "bar": "baz"}]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->discriminatedUnion(
+            'type',
+            [
+                $factory->object(['type' => $factory->literal('a'), 'foo' => $factory->integer()]),
+                $factory->object(['type' => $factory->literal('b'), 'bar' => $factory->string()]),
+            ],
+        );
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType("array{type: 'a', foo: int}|array{type: 'b', bar: string}", $result);
+    }
+
     public function testInteger(): void
     {
         // Arrange

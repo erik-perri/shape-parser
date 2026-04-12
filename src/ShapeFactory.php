@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser;
 
+use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
+use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
@@ -13,9 +15,30 @@ use Sourcetoad\ShapeParser\Parsers\UnionParser;
 
 class ShapeFactory
 {
+    /**
+     * @template T
+     * @param string $discriminator
+     * @param list<ParserContract<T>> $parsers
+     * @return DiscriminatedUnionParser<T>
+     */
+    public function discriminatedUnion(string $discriminator, array $parsers): DiscriminatedUnionParser
+    {
+        return new DiscriminatedUnionParser($discriminator, $parsers);
+    }
+
     public function integer(): IntegerParser
     {
         return new IntegerParser();
+    }
+
+    /**
+     * @template T of bool|int|string
+     * @param T $literal
+     * @return LiteralParser<T>
+     */
+    public function literal(bool|int|string $literal): LiteralParser
+    {
+        return new LiteralParser($literal);
     }
 
     /**

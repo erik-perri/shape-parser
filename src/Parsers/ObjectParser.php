@@ -19,7 +19,7 @@ final readonly class ObjectParser extends BaseParser
      * @param array<string, ParserContract<mixed>> $shape
      */
     public function __construct(
-        private array $shape,
+        public array $shape,
     ) {
         //
     }

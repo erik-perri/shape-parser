@@ -8,7 +8,13 @@ use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\TypeWithClassName;
+use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
+use Sourcetoad\ShapeParser\Parsers\LiteralParser;
+use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\ShapeFactory;
 
 class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
@@ -20,7 +26,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return $methodReflection->getName() === 'object';
+        return in_array($methodReflection->getName(), ['discriminatedUnion', 'literal', 'object'], true);
     }
 
     public function getTypeFromMethodCall(
@@ -34,8 +40,64 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
             return null;
         }
 
-        $shapeType = $scope->getType($methodArguments[0]->value);
+        return match ($methodReflection->getName()) {
+            'discriminatedUnion' => $this->resolveDiscriminatedUnion($methodCall, $scope),
+            'literal' => new GenericObjectType(LiteralParser::class, [
+                $scope->getType($methodArguments[0]->value),
+            ]),
+            'object' => (new ShapeTypeResolver)->resolve(
+                $scope->getType($methodArguments[0]->value),
+            ),
+            default => null,
+        };
+    }
 
-        return (new ShapeTypeResolver)->resolve($shapeType);
+    private function resolveDiscriminatedUnion(MethodCall $methodCall, Scope $scope): ?Type
+    {
+        $args = $methodCall->getArgs();
+
+        if (count($args) < 2) {
+            return null;
+        }
+
+        $parsersType = $scope->getType($args[1]->value);
+        $constantArrays = $parsersType->getConstantArrays();
+
+        if (count($constantArrays) === 0) {
+            return null;
+        }
+
+        $variantTypes = [];
+
+        foreach ($constantArrays as $constantArray) {
+            foreach ($constantArray->getValueTypes() as $valueType) {
+                if (!method_exists($valueType, 'getAncestorWithClassName')) {
+                    continue;
+                }
+
+                /** @var TypeWithClassName|null $ancestor */
+                // @phpstan-ignore phpstanApi.varTagAssumption
+                $ancestor = $valueType->getAncestorWithClassName(ObjectParser::class);
+
+                if ($ancestor === null || !method_exists($ancestor, 'getTypes')) {
+                    continue;
+                }
+
+                /** @var array<int, Type> $typeParams */
+                $typeParams = $ancestor->getTypes();
+
+                if (count($typeParams) > 0) {
+                    $variantTypes[] = $typeParams[0];
+                }
+            }
+        }
+
+        if (count($variantTypes) === 0) {
+            return null;
+        }
+
+        return new GenericObjectType(DiscriminatedUnionParser::class, [
+            TypeCombinator::union(...$variantTypes),
+        ]);
     }
 }
