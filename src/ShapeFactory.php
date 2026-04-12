@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser;
 
+use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
@@ -24,6 +25,11 @@ class ShapeFactory
     public function discriminatedUnion(string $discriminator, array $parsers): DiscriminatedUnionParser
     {
         return new DiscriminatedUnionParser($discriminator, $parsers);
+    }
+
+    public function boolean(): BooleanParser
+    {
+        return new BooleanParser();
     }
 
     public function integer(): IntegerParser

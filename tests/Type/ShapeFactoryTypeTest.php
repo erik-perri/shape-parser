@@ -33,6 +33,21 @@ class ShapeFactoryTypeTest
         assertType("array{type: 'a', foo: int}|array{type: 'b', bar: string}", $result);
     }
 
+    public function testBoolean(): void
+    {
+        // Arrange
+        $data = json_decode('true');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->boolean();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('bool', $result);
+    }
+
     public function testInteger(): void
     {
         // Arrange
@@ -185,6 +200,21 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType('array{}', $result);
+    }
+
+    public function testLenientBoolean(): void
+    {
+        // Arrange
+        $data = json_decode('true');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->boolean()->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('bool|null', $result);
     }
 
     public function testLenientString(): void
