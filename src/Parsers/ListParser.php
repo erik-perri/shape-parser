@@ -65,7 +65,7 @@ final readonly class ListParser extends BaseParser
             throw new ParseException('Failed to parse list');
         }
 
-        // @phpstan-ignore return.type
+        /** @var list<T> */
         return $result;
     }
 

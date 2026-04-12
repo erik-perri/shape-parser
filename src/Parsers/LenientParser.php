@@ -34,9 +34,12 @@ final readonly class LenientParser extends BaseParser
         return $result->success ? $result->data : null;
     }
 
-    /** @phpstan-ignore missingType.generics */
+    /**
+     * @return FallbackParser<T|null>
+     */
     public function fallback(mixed $fallback): FallbackParser
     {
+        /** @var FallbackParser<T|null> */
         return new FallbackParser($this->parser, $fallback);
     }
 

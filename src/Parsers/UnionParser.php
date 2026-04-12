@@ -37,7 +37,7 @@ final readonly class UnionParser extends BaseParser
             $result = $parser->safeParse($data);
 
             if ($result->success) {
-                // @phpstan-ignore return.type
+                /** @var T */
                 return $result->data;
             }
         }

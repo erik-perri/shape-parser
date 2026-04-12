@@ -60,7 +60,7 @@ final readonly class LenientListParser extends BaseParser
             }
         }
 
-        // @phpstan-ignore return.type
+        /** @var list<T> */
         return $result;
     }
 

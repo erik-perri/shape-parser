@@ -63,7 +63,7 @@ final readonly class ObjectParser extends BaseParser
             throw new ParseException('Failed to parse object');
         }
 
-        // @phpstan-ignore return.type
+        /** @var T */
         return $result;
     }
 }
