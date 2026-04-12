@@ -68,4 +68,21 @@ class LenientParserTest extends TestCase
         // Assert
         // No assertions, only expectations.
     }
+
+    public function testNullableAfterLenientThrows(): void
+    {
+        // Expectations
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot call nullable() on an already lenient parser.');
+
+        // Arrange
+        $parser = new StringParser();
+        $lenientParser = $parser->lenient();
+
+        // Act
+        $lenientParser->nullable();
+
+        // Assert
+        // No assertions, only expectations.
+    }
 }

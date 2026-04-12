@@ -417,4 +417,145 @@ class ShapeFactoryTypeTest
         // Assert
         assertType('list<string|null>', $result);
     }
+
+    public function testNullableString(): void
+    {
+        // Arrange
+        $data = json_decode('"foo"');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->string()->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('string|null', $result);
+    }
+
+    public function testNullableInteger(): void
+    {
+        // Arrange
+        $data = json_decode('123');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->integer()->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('int|null', $result);
+    }
+
+    public function testNullableBoolean(): void
+    {
+        // Arrange
+        $data = json_decode('true');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->boolean()->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('bool|null', $result);
+    }
+
+    public function testNullableFloat(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->float()->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float|null', $result);
+    }
+
+    public function testNullableNumber(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->number()->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float|int|null', $result);
+    }
+
+    public function testNullableList(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", "bar"]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->list($factory->string())->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('list<string>|null', $result);
+    }
+
+    public function testNullableRecord(): void
+    {
+        // Arrange
+        $data = json_decode('{"foo": 123, "bar": 456}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->record($factory->string(), $factory->integer())->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array<string, int>|null', $result);
+    }
+
+    public function testNullableObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"stringValue": "foo", "integerValue": 123}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'stringValue' => $factory->string(),
+            'integerValue' => $factory->integer(),
+        ])->nullable();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{stringValue: string, integerValue: int}|null', $result);
+    }
+
+    public function testNullableInObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"name": "foo", "count": 123}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'name' => $factory->string()->nullable(),
+            'count' => $factory->integer(),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{name: string|null, count: int}', $result);
+    }
 }

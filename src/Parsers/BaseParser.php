@@ -33,4 +33,13 @@ abstract readonly class BaseParser implements ParserContract
         // @phpstan-ignore return.type
         return new LenientParser($this);
     }
+
+    /**
+     * @return BaseParser<T>
+     */
+    public function nullable(): BaseParser
+    {
+        // @phpstan-ignore return.type
+        return new NullableParser($this);
+    }
 }

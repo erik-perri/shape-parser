@@ -47,4 +47,9 @@ final readonly class LenientParser extends BaseParser
     {
         throw new LogicException('Cannot call lenient() on an already lenient parser.');
     }
+
+    public function nullable(): never
+    {
+        throw new LogicException('Cannot call nullable() on an already lenient parser.');
+    }
 }
