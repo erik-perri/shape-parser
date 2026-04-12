@@ -8,6 +8,7 @@ namespace Sourcetoad\ShapeParser\Tests\Type;
 
 use DateTimeImmutable;
 use Sourcetoad\ShapeParser\ShapeFactory;
+use Sourcetoad\ShapeParser\Tests\Fixtures\StatusEnum;
 
 use function PHPStan\Testing\assertType;
 
@@ -122,6 +123,21 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType('list<string>', $result);
+    }
+
+    public function testEnum(): void
+    {
+        // Arrange
+        $data = json_decode('"active"');
+
+        $factory = new ShapeFactory;
+        $parser = $factory->enum(StatusEnum::class);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('Sourcetoad\ShapeParser\Tests\Fixtures\StatusEnum', $result);
     }
 
     public function testRecord(): void

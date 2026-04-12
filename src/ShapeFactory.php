@@ -6,6 +6,7 @@ namespace Sourcetoad\ShapeParser;
 
 use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
+use Sourcetoad\ShapeParser\Parsers\EnumParser;
 use Sourcetoad\ShapeParser\Parsers\FloatParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
@@ -32,6 +33,17 @@ class ShapeFactory
     public function boolean(): BooleanParser
     {
         return new BooleanParser;
+    }
+
+    /**
+     * @template TEnum of \UnitEnum
+     *
+     * @param  class-string<TEnum>  $enumClass
+     * @return EnumParser<TEnum>
+     */
+    public function enum(string $enumClass): EnumParser
+    {
+        return new EnumParser($enumClass);
     }
 
     public function float(): FloatParser
