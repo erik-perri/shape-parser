@@ -47,6 +47,10 @@ final readonly class ObjectParser extends BaseParser
 
         foreach ($this->shape as $key => $parser) {
             if (!array_key_exists($key, $data)) {
+                if ($parser instanceof OptionalParser) {
+                    continue;
+                }
+
                 $errors[$key] = new ParseError("Missing required field: $key");
                 continue;
             }

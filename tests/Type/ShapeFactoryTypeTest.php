@@ -560,6 +560,62 @@ class ShapeFactoryTypeTest
         assertType('array{name: string|null, count: int}', $result);
     }
 
+    public function testOptionalInObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"name": "foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'name' => $factory->string(),
+            'count' => $factory->integer()->optional(),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{name: string, count?: int}', $result);
+    }
+
+    public function testNullableOptionalInObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"name": "foo", "count": null}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'name' => $factory->string(),
+            'count' => $factory->integer()->nullable()->optional(),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{name: string, count?: int|null}', $result);
+    }
+
+    public function testOptionalObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"name": "foo"}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'name' => $factory->string(),
+            'address' => $factory->object([
+                'street' => $factory->string(),
+            ])->optional(),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{name: string, address?: array{street: string}}', $result);
+    }
+
     public function testTransformString(): void
     {
         // Arrange

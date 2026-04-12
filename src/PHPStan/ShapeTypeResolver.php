@@ -11,6 +11,7 @@ use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeWithClassName;
 use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
+use Sourcetoad\ShapeParser\Parsers\OptionalParser;
 
 class ShapeTypeResolver
 {
@@ -37,13 +38,26 @@ class ShapeTypeResolver
                     continue;
                 }
 
-                $builder->setOffsetValueType($keyType, $parserResultType);
+                $builder->setOffsetValueType(
+                    $keyType,
+                    $parserResultType,
+                    $this->isOptionalParser($parserType),
+                );
             }
 
             $results[] = new GenericObjectType(ObjectParser::class, [$builder->getArray()]);
         }
 
         return TypeCombinator::union(...$results);
+    }
+
+    private function isOptionalParser(Type $parserType): bool
+    {
+        if (!method_exists($parserType, 'getAncestorWithClassName')) {
+            return false;
+        }
+
+        return $parserType->getAncestorWithClassName(OptionalParser::class) !== null;
     }
 
     private function resolveParserContractGeneric(Type $parserType): ?Type

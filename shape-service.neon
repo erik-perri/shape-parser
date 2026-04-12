@@ -15,3 +15,7 @@ services:
         class: Sourcetoad\ShapeParser\PHPStan\NullableReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: Sourcetoad\ShapeParser\PHPStan\OptionalReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

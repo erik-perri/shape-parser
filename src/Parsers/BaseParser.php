@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
-use Closure;
 use Sourcetoad\ShapeParser\Data\ParseResultData;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
@@ -45,12 +44,20 @@ abstract readonly class BaseParser implements ParserContract
     }
 
     /**
+     * @return BaseParser<T>
+     */
+    public function optional(): BaseParser
+    {
+        return new OptionalParser($this);
+    }
+
+    /**
      * @template U
      * @param callable(T): U $fn
      * @return TransformParser<T, U>
      */
     public function transform(callable $fn): TransformParser
     {
-        return new TransformParser($this, Closure::fromCallable($fn));
+        return new TransformParser($this, $fn(...));
     }
 }
