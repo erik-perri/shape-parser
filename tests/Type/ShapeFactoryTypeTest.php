@@ -186,4 +186,97 @@ class ShapeFactoryTypeTest
         // Assert
         assertType('array{}', $result);
     }
+
+    public function testLenientString(): void
+    {
+        // Arrange
+        $data = json_decode('"foo"');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->string()->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('string|null', $result);
+    }
+
+    public function testLenientInteger(): void
+    {
+        // Arrange
+        $data = json_decode('123');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->integer()->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('int|null', $result);
+    }
+
+    public function testLenientList(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", "bar"]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->list($factory->string())->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('list<string>', $result);
+    }
+
+    public function testLenientRecord(): void
+    {
+        // Arrange
+        $data = json_decode('{"foo": 123, "bar": 456}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->record($factory->string(), $factory->integer())->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array<string, int>', $result);
+    }
+
+    public function testLenientObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"stringValue": "foo", "integerValue": 123}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'stringValue' => $factory->string(),
+            'integerValue' => $factory->integer(),
+        ])->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{stringValue: string, integerValue: int}|null', $result);
+    }
+
+    public function testLenientItemsInList(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", "bar"]');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->list($factory->string()->lenient());
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('list<string|null>', $result);
+    }
 }

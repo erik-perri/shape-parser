@@ -24,4 +24,10 @@ abstract readonly class BaseParser implements ParserContract
             return new ParseResultData(false, null, $e);
         }
     }
+
+    /** @phpstan-ignore missingType.generics */
+    public function lenient(): BaseParser
+    {
+        return new LenientParser($this);
+    }
 }

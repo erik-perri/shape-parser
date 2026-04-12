@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
+use LogicException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 use stdClass;
@@ -12,7 +13,7 @@ use stdClass;
  * @template T of mixed
  * @extends BaseParser<list<T>>
  */
-final readonly class ListParser extends BaseParser
+final readonly class LenientListParser extends BaseParser
 {
     /**
      * @param ParserContract<T> $parser
@@ -25,7 +26,7 @@ final readonly class ListParser extends BaseParser
 
     public function describe(): string
     {
-        return sprintf('list<%s>', $this->parser->describe());
+        return sprintf('lenient<list<%s>>', $this->parser->describe());
     }
 
     /**
@@ -50,30 +51,21 @@ final readonly class ListParser extends BaseParser
         }
 
         $result = [];
-        $errors = [];
 
-        foreach ($data as $index => $value) {
-            try {
-                $result[$index] = $this->parser->parse($value);
-            } catch (ParseException $e) {
-                $errors[$index] = $e;
+        foreach ($data as $value) {
+            $parsed = $this->parser->safeParse($value);
+
+            if ($parsed->success) {
+                $result[] = $parsed->data;
             }
-        }
-
-        if (!empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse list');
         }
 
         // @phpstan-ignore return.type
         return $result;
     }
 
-    /**
-     * @return LenientListParser<T>
-     */
-    public function lenient(): BaseParser
+    public function lenient(): never
     {
-        return new LenientListParser($this->parser);
+        throw new LogicException('Cannot call lenient() on an already lenient parser.');
     }
 }

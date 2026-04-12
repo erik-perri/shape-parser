@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
+use LogicException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 use stdClass;
@@ -13,7 +14,7 @@ use stdClass;
  * @template T of mixed
  * @extends BaseParser<array<K, T>>
  */
-final readonly class RecordParser extends BaseParser
+final readonly class LenientRecordParser extends BaseParser
 {
     /**
      * @param ParserContract<K> $keyParser
@@ -28,7 +29,7 @@ final readonly class RecordParser extends BaseParser
 
     public function describe(): string
     {
-        return sprintf('record<%s, %s>', $this->keyParser->describe(), $this->valueParser->describe());
+        return sprintf('lenient<record<%s, %s>>', $this->keyParser->describe(), $this->valueParser->describe());
     }
 
     /**
@@ -48,32 +49,29 @@ final readonly class RecordParser extends BaseParser
          * @var array<K, T> $result
          */
         $result = [];
-        $errors = [];
 
         foreach ($data as $key => $value) {
-            try {
-                $key = $this->keyParser->parse($key);
-                $value = $this->valueParser->parse($value);
+            $parsedKey = $this->keyParser->safeParse($key);
 
-                $result[$key] = $value;
-            } catch (ParseException $e) {
-                $errors[$key] = $e;
+            if (!$parsedKey->success) {
+                continue;
             }
+
+            $parsedValue = $this->valueParser->safeParse($value);
+
+            if (!$parsedValue->success) {
+                continue;
+            }
+
+            $result[$parsedKey->data] = $parsedValue->data;
         }
 
-        if (!empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse record');
-        }
-
+        // @phpstan-ignore return.type
         return $result;
     }
 
-    /**
-     * @return LenientRecordParser<K, T>
-     */
-    public function lenient(): BaseParser
+    public function lenient(): never
     {
-        return new LenientRecordParser($this->keyParser, $this->valueParser);
+        throw new LogicException('Cannot call lenient() on an already lenient parser.');
     }
 }
