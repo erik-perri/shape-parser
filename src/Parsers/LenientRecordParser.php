@@ -63,7 +63,9 @@ final readonly class LenientRecordParser extends BaseParser
                 continue;
             }
 
-            $result[$parsedKey->data] = $parsedValue->data;
+            /** @var K $key */
+            $key = $parsedKey->data;
+            $result[$key] = $parsedValue->data;
         }
 
         // @phpstan-ignore return.type
