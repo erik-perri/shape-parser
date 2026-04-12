@@ -48,6 +48,21 @@ class ShapeFactoryTypeTest
         assertType('bool', $result);
     }
 
+    public function testFloat(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->float();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float', $result);
+    }
+
     public function testInteger(): void
     {
         // Arrange
@@ -61,6 +76,21 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType('int', $result);
+    }
+
+    public function testNumber(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->number();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float|int', $result);
     }
 
     public function testString(): void
@@ -200,6 +230,36 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType('array{}', $result);
+    }
+
+    public function testLenientFloat(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->float()->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float|null', $result);
+    }
+
+    public function testLenientNumber(): void
+    {
+        // Arrange
+        $data = json_decode('1.5');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->number()->lenient();
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('float|int|null', $result);
     }
 
     public function testLenientBoolean(): void

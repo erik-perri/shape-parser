@@ -6,7 +6,9 @@ namespace Sourcetoad\ShapeParser;
 
 use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
+use Sourcetoad\ShapeParser\Parsers\FloatParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
+use Sourcetoad\ShapeParser\Parsers\NumberParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
@@ -32,6 +34,11 @@ class ShapeFactory
         return new BooleanParser();
     }
 
+    public function float(): FloatParser
+    {
+        return new FloatParser();
+    }
+
     public function integer(): IntegerParser
     {
         return new IntegerParser();
@@ -55,6 +62,11 @@ class ShapeFactory
     public function list(ParserContract $parser): ListParser
     {
         return new ListParser($parser);
+    }
+
+    public function number(): NumberParser
+    {
+        return new NumberParser();
     }
 
     /**
