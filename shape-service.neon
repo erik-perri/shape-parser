@@ -7,3 +7,7 @@ services:
         class: Sourcetoad\ShapeParser\PHPStan\LenientReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+    -
+        class: Sourcetoad\ShapeParser\PHPStan\FallbackReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

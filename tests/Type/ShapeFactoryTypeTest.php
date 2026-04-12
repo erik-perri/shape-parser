@@ -355,6 +355,54 @@ class ShapeFactoryTypeTest
         assertType('array{stringValue: string, integerValue: int}|null', $result);
     }
 
+    public function testFallbackString(): void
+    {
+        // Arrange
+        $data = json_decode('"foo"');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->string()->lenient()->fallback('fallback');
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('string', $result);
+    }
+
+    public function testFallbackInteger(): void
+    {
+        // Arrange
+        $data = json_decode('123');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->integer()->lenient()->fallback(0);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('int', $result);
+    }
+
+    public function testFallbackInObjectShape(): void
+    {
+        // Arrange
+        $data = json_decode('{"name": "foo", "count": 123}');
+
+        $factory = new ShapeFactory();
+        $parser = $factory->object([
+            'name' => $factory->string()->lenient()->fallback('unknown'),
+            'count' => $factory->integer()->lenient()->fallback(0),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{name: string, count: int}', $result);
+    }
+
     public function testLenientItemsInList(): void
     {
         // Arrange
