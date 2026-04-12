@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Feature;
+namespace Sourcetoad\ShapeParser\Tests\Feature;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\ShapeFactory;
+use Sourcetoad\ShapeParser\Tests\Fixtures\ContentData;
+use Sourcetoad\ShapeParser\Tests\Fixtures\PostData;
+use Sourcetoad\ShapeParser\Tests\Fixtures\UserData;
 
 #[CoversNothing]
 class HydratedShapeTest extends TestCase
@@ -189,12 +192,12 @@ class HydratedShapeTest extends TestCase
                 'user_id' => $factory->integer(),
                 'first_name' => $factory->string(),
                 'created_at' => $factory->string(),
-            ])->transform(fn (array $a) => new UserDto(
+            ])->transform(fn (array $a) => new UserData(
                 userId: $a['user_id'],
                 firstName: $a['first_name'],
                 createdAt: $a['created_at'],
             )),
-        ])->transform(fn (array $a) => new PostDto(
+        ])->transform(fn (array $a) => new PostData(
             title: $a['title'],
             author: $a['author'],
         ));
@@ -203,42 +206,10 @@ class HydratedShapeTest extends TestCase
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertInstanceOf(PostDto::class, $result);
+        $this->assertInstanceOf(PostData::class, $result);
         $this->assertSame('Hello', $result->title);
-        $this->assertInstanceOf(UserDto::class, $result->author);
+        $this->assertInstanceOf(UserData::class, $result->author);
         $this->assertSame(7, $result->author->userId);
         $this->assertSame('User', $result->author->firstName);
-    }
-}
-
-final readonly class ContentData
-{
-    public function __construct(
-        public int $id,
-        public string $title,
-        public ?string $url,
-    ) {
-        //
-    }
-}
-
-final readonly class UserDto
-{
-    public function __construct(
-        public int $userId,
-        public string $firstName,
-        public string $createdAt,
-    ) {
-        //
-    }
-}
-
-final readonly class PostDto
-{
-    public function __construct(
-        public string $title,
-        public UserDto $author,
-    ) {
-        //
     }
 }
