@@ -16,7 +16,6 @@ use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
-use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\UnionParser;
 use Sourcetoad\ShapeParser\ShapeFactory;
@@ -82,23 +81,10 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
 
         foreach ($constantArrays as $constantArray) {
             foreach ($constantArray->getValueTypes() as $valueType) {
-                if (! method_exists($valueType, 'getAncestorWithClassName')) {
-                    continue;
-                }
+                $variantType = $this->resolveParserContractGeneric($valueType);
 
-                /** @var TypeWithClassName|null $ancestor */
-                // @phpstan-ignore phpstanApi.varTagAssumption
-                $ancestor = $valueType->getAncestorWithClassName(ObjectParser::class);
-
-                if ($ancestor === null || ! method_exists($ancestor, 'getTypes')) {
-                    continue;
-                }
-
-                /** @var array<int, Type> $typeParams */
-                $typeParams = $ancestor->getTypes();
-
-                if (count($typeParams) > 0) {
-                    $variantTypes[] = $typeParams[0];
+                if ($variantType !== null) {
+                    $variantTypes[] = $variantType;
                 }
             }
         }

@@ -8,6 +8,8 @@ namespace Sourcetoad\ShapeParser\Tests\Type;
 
 use DateTimeImmutable;
 use Sourcetoad\ShapeParser\ShapeFactory;
+use Sourcetoad\ShapeParser\Tests\Fixtures\ContentData;
+use Sourcetoad\ShapeParser\Tests\Fixtures\SampleData;
 use Sourcetoad\ShapeParser\Tests\Fixtures\StatusEnum;
 
 use function PHPStan\Testing\assertType;
@@ -671,13 +673,13 @@ class ShapeFactoryTypeTest
         $parser = $factory->object([
             'id' => $factory->integer(),
             'title' => $factory->string(),
-        ])->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']));
+        ])->transform(fn (array $a): SampleData => new SampleData($a['id'], $a['title']));
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto', $result);
+        assertType('Sourcetoad\ShapeParser\Tests\Fixtures\SampleData', $result);
     }
 
     public function testTransformLenient(): void
@@ -690,14 +692,14 @@ class ShapeFactoryTypeTest
             'id' => $factory->integer(),
             'title' => $factory->string(),
         ])
-            ->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a): SampleData => new SampleData($a['id'], $a['title']))
             ->lenient();
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto|null', $result);
+        assertType('Sourcetoad\ShapeParser\Tests\Fixtures\SampleData|null', $result);
     }
 
     public function testTransformNullable(): void
@@ -710,14 +712,14 @@ class ShapeFactoryTypeTest
             'id' => $factory->integer(),
             'title' => $factory->string(),
         ])
-            ->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title']))
+            ->transform(fn (array $a): SampleData => new SampleData($a['id'], $a['title']))
             ->nullable();
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        assertType('Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto|null', $result);
+        assertType('Sourcetoad\ShapeParser\Tests\Fixtures\SampleData|null', $result);
     }
 
     public function testTransformListOfHydrated(): void
@@ -730,14 +732,14 @@ class ShapeFactoryTypeTest
             $factory->object([
                 'id' => $factory->integer(),
                 'title' => $factory->string(),
-            ])->transform(fn (array $a): TypeTestSampleDto => new TypeTestSampleDto($a['id'], $a['title'])),
+            ])->transform(fn (array $a): SampleData => new SampleData($a['id'], $a['title'])),
         );
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        assertType('list<Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDto>', $result);
+        assertType('list<Sourcetoad\ShapeParser\Tests\Fixtures\SampleData>', $result);
     }
 
     public function testTransformDiscriminatedUnion(): void
@@ -750,11 +752,11 @@ class ShapeFactoryTypeTest
             $factory->object([
                 'version' => $factory->literal(1),
                 'title' => $factory->string(),
-            ])->transform(fn (array $a): TypeTestSampleDtoA => new TypeTestSampleDtoA($a['title'])),
+            ])->transform(fn (array $a): SampleData => new SampleData(1, $a['title'])),
             $factory->object([
                 'version' => $factory->literal(2),
                 'title' => $factory->string(),
-            ])->transform(fn (array $a): TypeTestSampleDtoB => new TypeTestSampleDtoB($a['title'])),
+            ])->transform(fn (array $a): ContentData => new ContentData(2, $a['title'], null)),
         ]);
 
         // Act
@@ -762,26 +764,37 @@ class ShapeFactoryTypeTest
 
         // Assert
         assertType(
-            'Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDtoA|Sourcetoad\ShapeParser\Tests\Type\TypeTestSampleDtoB',
+            'Sourcetoad\ShapeParser\Tests\Fixtures\ContentData|Sourcetoad\ShapeParser\Tests\Fixtures\SampleData',
             $result,
         );
     }
-}
 
-final readonly class TypeTestSampleDto
-{
-    public function __construct(
-        public int $id,
-        public string $title,
-    ) {}
-}
+    public function testTransformDiscriminatedUnionMixed(): void
+    {
+        // Arrange
+        $data = json_decode('[{"version": 1, "title": "Foo"}, {"version": 2, "title": "Bar"}]');
 
-final readonly class TypeTestSampleDtoA
-{
-    public function __construct(public string $title) {}
-}
+        $factory = new ShapeFactory;
+        $parser = $factory->list(
+            $factory->discriminatedUnion('version', [
+                $factory->object([
+                    'version' => $factory->literal(1),
+                    'title' => $factory->string(),
+                ])->transform(fn (array $a): SampleData => new SampleData(1, $a['title'])),
+                $factory->object([
+                    'version' => $factory->literal(2),
+                    'title' => $factory->string(),
+                ]),
+            ]),
+        );
 
-final readonly class TypeTestSampleDtoB
-{
-    public function __construct(public string $title) {}
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType(
+            "list<array{version: 2, title: string}|Sourcetoad\ShapeParser\Tests\Fixtures\SampleData>",
+            $result,
+        );
+    }
 }
