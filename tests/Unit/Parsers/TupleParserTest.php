@@ -7,6 +7,7 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Sourcetoad\ShapeParser\Data\ParseIssue;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\Parsers\FloatParser;
@@ -89,7 +90,7 @@ class TupleParserTest extends TestCase
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        // Arrange + Act
+        // Act
         $parser->parse($data);
 
         // Assert
@@ -97,7 +98,7 @@ class TupleParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{parser: TupleParser, data: mixed, expectedMessage: string}>
+     * @return array<string, array{parser: TupleParser, data: mixed, expectedMessage: list<ParseIssue>}>
      */
     public static function invalidCasesProvider(): array
     {
@@ -127,12 +128,17 @@ class TupleParserTest extends TestCase
             'wrong type at position 0' => [
                 'parser' => $stringInt,
                 'data' => json_decode('[42, 42]'),
-                'expectedMessage' => 'Failed to parse tuple',
+                'expectedMessage' => "Failed to parse:\n  at [0]: Expected string, got int",
             ],
             'wrong type at position 1' => [
                 'parser' => $stringInt,
                 'data' => json_decode('["foo", "bar"]'),
-                'expectedMessage' => 'Failed to parse tuple',
+                'expectedMessage' => "Failed to parse:\n  at [1]: Expected int, got string",
+            ],
+            'both positions wrong type' => [
+                'parser' => $stringInt,
+                'data' => json_decode('[42, "bar"]'),
+                'expectedMessage' => "Failed to parse:\n  at [0]: Expected string, got int\n  at [1]: Expected int, got string",
             ],
         ];
     }

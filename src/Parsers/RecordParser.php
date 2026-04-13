@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
+use Sourcetoad\ShapeParser\Data\ParseIssue;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
@@ -81,7 +82,7 @@ final readonly class RecordParser extends BaseParser implements CanBeFallback, C
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
@@ -90,22 +91,30 @@ final readonly class RecordParser extends BaseParser implements CanBeFallback, C
          * @var array<K, T> $result
          */
         $result = [];
-        $errors = [];
+        $issues = [];
 
         foreach ($data as $key => $value) {
             try {
-                $key = $this->keyParser->parse($key);
-                $value = $this->valueParser->parse($value);
-
-                $result[$key] = $value;
+                $parsedKey = $this->keyParser->parse($key);
             } catch (ParseException $e) {
-                $errors[$key] = $e;
+                foreach ($e->issues as $issue) {
+                    $issues[] = new ParseIssue([$key, ...$issue->path], 'key: '.$issue->message);
+                }
+
+                continue;
+            }
+
+            try {
+                $result[$parsedKey] = $this->valueParser->parse($value);
+            } catch (ParseException $e) {
+                foreach ($e->issues as $issue) {
+                    $issues[] = $issue->withPrefix($key);
+                }
             }
         }
 
-        if (! empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse record');
+        if ($issues !== []) {
+            throw ParseException::fromIssues($issues);
         }
 
         return $result;

@@ -62,10 +62,11 @@ class OptionalParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function test_parse_throws_on_invalid_input(BaseParser $inner, mixed $input): void
+    public function test_parse_throws_on_invalid_input(BaseParser $inner, mixed $input, string $expectedMessage): void
     {
         // Expectations
         $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         // Arrange
         $parser = Modifiers::optional($inner);
@@ -86,14 +87,17 @@ class OptionalParserTest extends TestCase
             'string given int' => [
                 'inner' => new StringParser,
                 'input' => 123,
+                'expectedMessage' => 'Expected string, got int',
             ],
             'string given null' => [
                 'inner' => new StringParser,
                 'input' => null,
+                'expectedMessage' => 'Expected string, got null',
             ],
             'integer given string' => [
                 'inner' => new IntegerParser,
                 'input' => 'hello',
+                'expectedMessage' => 'Expected int, got string',
             ],
         ];
     }

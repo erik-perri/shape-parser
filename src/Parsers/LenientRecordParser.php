@@ -50,7 +50,7 @@ final readonly class LenientRecordParser extends BaseParser implements CanBeOpti
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
@@ -64,12 +64,14 @@ final readonly class LenientRecordParser extends BaseParser implements CanBeOpti
             $parsedKey = $this->keyParser->safeParse($key);
 
             if (! $parsedKey->success) {
+                // TODO: expose ignored ParseIssues via a user-supplied hook (design TBD)
                 continue;
             }
 
             $parsedValue = $this->valueParser->safeParse($value);
 
             if (! $parsedValue->success) {
+                // TODO: expose ignored ParseIssues via a user-supplied hook (design TBD)
                 continue;
             }
 

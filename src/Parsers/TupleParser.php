@@ -67,13 +67,13 @@ final readonly class TupleParser extends BaseParser implements CanBeFallback, Ca
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
         if (! array_is_list($data)) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Expected %s, got array with keys: %s',
                 $this->describe(),
                 implode(', ', array_keys($data)),
@@ -84,7 +84,7 @@ final readonly class TupleParser extends BaseParser implements CanBeFallback, Ca
         $actual = count($data);
 
         if ($expected !== $actual) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Expected %s of length %d, got %d',
                 $this->describe(),
                 $expected,
@@ -93,19 +93,20 @@ final readonly class TupleParser extends BaseParser implements CanBeFallback, Ca
         }
 
         $result = [];
-        $errors = [];
+        $issues = [];
 
         foreach ($this->parsers as $index => $parser) {
             try {
                 $result[$index] = $parser->parse($data[$index]);
             } catch (ParseException $e) {
-                $errors[$index] = $e;
+                foreach ($e->issues as $issue) {
+                    $issues[] = $issue->withPrefix($index);
+                }
             }
         }
 
-        if (! empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse tuple');
+        if ($issues !== []) {
+            throw ParseException::fromIssues($issues);
         }
 
         /** @var T */

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
-use ParseError;
+use Sourcetoad\ShapeParser\Data\ParseIssue;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
@@ -64,12 +64,12 @@ final readonly class ObjectParser extends BaseParser implements CanBeFallback, C
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
         $result = [];
-        $errors = [];
+        $issues = [];
 
         foreach ($this->shape as $key => $parser) {
             if (! array_key_exists($key, $data)) {
@@ -77,7 +77,7 @@ final readonly class ObjectParser extends BaseParser implements CanBeFallback, C
                     continue;
                 }
 
-                $errors[$key] = new ParseError("Missing required field: $key");
+                $issues[] = new ParseIssue([$key], 'Missing required field');
 
                 continue;
             }
@@ -85,13 +85,14 @@ final readonly class ObjectParser extends BaseParser implements CanBeFallback, C
             try {
                 $result[$key] = $parser->parse($data[$key]);
             } catch (ParseException $e) {
-                $errors[$key] = $e;
+                foreach ($e->issues as $issue) {
+                    $issues[] = $issue->withPrefix($key);
+                }
             }
         }
 
-        if (! empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse object');
+        if ($issues !== []) {
+            throw ParseException::fromIssues($issues);
         }
 
         /** @var T */

@@ -41,6 +41,7 @@ final readonly class LenientParser extends BaseParser implements CanBeOptional, 
     {
         $result = $this->parser->safeParse($data);
 
+        // TODO: expose ignored ParseIssues via a user-supplied hook (design TBD)
         return $result->success ? $result->data : null;
     }
 

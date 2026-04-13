@@ -47,13 +47,13 @@ final readonly class LenientListParser extends BaseParser implements CanBeOption
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
         if (! array_is_list($data)) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Expected %s, got array with keys: %s',
                 $this->describe(),
                 implode(', ', array_keys($data)),
@@ -68,6 +68,7 @@ final readonly class LenientListParser extends BaseParser implements CanBeOption
             if ($parsed->success) {
                 $result[] = $parsed->data;
             }
+            // TODO: expose ignored ParseIssues via a user-supplied hook (design TBD)
         }
 
         /** @var list<T> */

@@ -51,10 +51,11 @@ class LenientListParserTest extends TestCase
     }
 
     #[DataProvider('invalidInputProvider')]
-    public function test_parse_throws_when_input_is_invalid(mixed $input): void
+    public function test_parse_throws_when_input_is_invalid(mixed $input, string $expectedMessage): void
     {
         // Expectations
         $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         // Arrange
         $lenientParser = Modifiers::lenient(new ListParser(new StringParser));
@@ -67,16 +68,18 @@ class LenientListParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{input: mixed}>
+     * @return array<string, array{input: mixed, expectedMessage: string}>
      */
     public static function invalidInputProvider(): array
     {
         return [
             'not an array' => [
                 'input' => 'not an array',
+                'expectedMessage' => 'Expected lenient<list<string>>, got string',
             ],
             'not a list' => [
                 'input' => ['a' => 'foo', 'b' => 'bar'],
+                'expectedMessage' => 'Expected lenient<list<string>>, got array with keys: a, b',
             ],
         ];
     }

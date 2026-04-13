@@ -60,14 +60,14 @@ final readonly class EnumParser extends BaseParser implements CanBeFallback, Can
     public function parse(mixed $data): UnitEnum
     {
         if (! is_string($data) && ! is_int($data)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         if (is_subclass_of($this->enumClass, BackedEnum::class)) {
             $value = $this->enumClass::tryFrom($data);
 
             if ($value === null) {
-                throw new ParseException(sprintf('Expected %s, got "%s"', $this->describe(), $data));
+                throw ParseException::fromMessage(sprintf('Expected %s, got "%s"', $this->describe(), $data));
             }
 
             return $value;
@@ -79,6 +79,6 @@ final readonly class EnumParser extends BaseParser implements CanBeFallback, Can
             }
         }
 
-        throw new ParseException(sprintf('Expected %s, got "%s"', $this->describe(), $data));
+        throw ParseException::fromMessage(sprintf('Expected %s, got "%s"', $this->describe(), $data));
     }
 }

@@ -70,13 +70,13 @@ final readonly class ListParser extends BaseParser implements CanBeFallback, Can
     public function parse(mixed $data): array
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
         if (! array_is_list($data)) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Expected %s, got array with keys: %s',
                 $this->describe(),
                 implode(', ', array_keys($data)),
@@ -84,19 +84,20 @@ final readonly class ListParser extends BaseParser implements CanBeFallback, Can
         }
 
         $result = [];
-        $errors = [];
+        $issues = [];
 
         foreach ($data as $index => $value) {
             try {
                 $result[$index] = $this->parser->parse($value);
             } catch (ParseException $e) {
-                $errors[$index] = $e;
+                foreach ($e->issues as $issue) {
+                    $issues[] = $issue->withPrefix($index);
+                }
             }
         }
 
-        if (! empty($errors)) {
-            // TODO Better error reporting
-            throw new ParseException('Failed to parse list');
+        if ($issues !== []) {
+            throw ParseException::fromIssues($issues);
         }
 
         /** @var list<T> */

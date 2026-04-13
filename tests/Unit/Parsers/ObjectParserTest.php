@@ -7,9 +7,11 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Sourcetoad\ShapeParser\Data\ParseIssue;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
+use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
 
@@ -87,13 +89,13 @@ class ObjectParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function test_parse_throws_when_invalid(ObjectParser $parser, mixed $data): void
+    public function test_parse_throws_when_invalid(ObjectParser $parser, mixed $data, string $expectedMessage): void
     {
         // Expectations
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Failed to parse object');
+        $this->expectExceptionMessage($expectedMessage);
 
-        // Arrange + Act
+        // Act
         $parser->parse($data);
 
         // Assert
@@ -101,7 +103,7 @@ class ObjectParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{parser: ObjectParser, data: mixed}>
+     * @return array<string, array{parser: ObjectParser, data: mixed, expectedMessage: list<ParseIssue>}>
      */
     public static function invalidCasesProvider(): array
     {
@@ -111,18 +113,21 @@ class ObjectParserTest extends TestCase
                     'foo' => new StringParser,
                 ]),
                 'data' => json_decode('{"bar": "foo"}'),
+                'expectedMessage' => "Failed to parse:\n  at [foo]: Missing required field",
             ],
             'optional field present but wrong type' => [
                 'parser' => new ObjectParser([
                     'foo' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{"foo": 123}'),
+                'expectedMessage' => "Failed to parse:\n  at [foo]: Expected string, got int",
             ],
             'optional field present but null on non-nullable inner' => [
                 'parser' => new ObjectParser([
                     'foo' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{"foo": null}'),
+                'expectedMessage' => "Failed to parse:\n  at [foo]: Expected string, got null",
             ],
             'required field still fails when optional fields also absent' => [
                 'parser' => new ObjectParser([
@@ -130,6 +135,33 @@ class ObjectParserTest extends TestCase
                     'bar' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{}'),
+                'expectedMessage' => "Failed to parse:\n  at [foo]: Missing required field",
+            ],
+            'multiple bad fields aggregated' => [
+                'parser' => new ObjectParser([
+                    'foo' => new StringParser,
+                    'bar' => new IntegerParser,
+                ]),
+                'data' => json_decode('{"foo": 123, "bar": "oops"}'),
+                'expectedMessage' => "Failed to parse:\n  at [foo]: Expected string, got int\n  at [bar]: Expected int, got string",
+            ],
+            'nested object failure reports full path' => [
+                'parser' => new ObjectParser([
+                    'outer' => new ObjectParser([
+                        'inner' => new StringParser,
+                    ]),
+                ]),
+                'data' => json_decode('{"outer": {"inner": 5}}'),
+                'expectedMessage' => "Failed to parse:\n  at [outer][inner]: Expected string, got int",
+            ],
+            'list of objects reports index and key paths' => [
+                'parser' => new ObjectParser([
+                    'users' => new ListParser(new ObjectParser([
+                        'email' => new StringParser,
+                    ])),
+                ]),
+                'data' => json_decode('{"users": [{"email": "ok@example.com"}, {"email": 5}, {"email": null}]}'),
+                'expectedMessage' => "Failed to parse:\n  at [users][1][email]: Expected string, got int\n  at [users][2][email]: Expected string, got null",
             ],
         ];
     }

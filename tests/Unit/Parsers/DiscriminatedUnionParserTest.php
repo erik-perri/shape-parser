@@ -40,7 +40,7 @@ class DiscriminatedUnionParserTest extends TestCase
     {
         // Expectations
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Failed to parse object');
+        $this->expectExceptionMessage("Failed to parse:\n  at [value]: Expected string, got int");
 
         // Arrange
         $parser = new DiscriminatedUnionParser('type', [

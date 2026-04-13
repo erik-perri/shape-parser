@@ -44,7 +44,7 @@ final readonly class FloatParser extends BaseParser implements CanBeFallback, Ca
     public function parse(mixed $data): float
     {
         if (! is_float($data)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;

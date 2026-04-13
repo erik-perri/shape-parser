@@ -50,13 +50,32 @@ class RecordParserTest extends TestCase
     {
         // Expectations
         $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Failed to parse record');
+        $this->expectExceptionMessage('key: Expected string, got int');
 
         // Arrange
         $parser = new RecordParser(new StringParser, new ObjectParser([
             'foo' => new StringParser,
         ]));
         $data = json_decode('{"0": {"foo": "bar"}, "1": {"foo": "baz"}}');
+
+        // Act
+        $parser->parse($data);
+
+        // Assert
+        // No assertions, only expectations.
+    }
+
+    public function test_parse_aggregates_value_errors_with_path(): void
+    {
+        // Expectations
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage("Failed to parse:\n  at [a][foo]: Expected string, got int\n  at [b][foo]: Expected string, got int");
+
+        // Arrange
+        $parser = new RecordParser(new StringParser, new ObjectParser([
+            'foo' => new StringParser,
+        ]));
+        $data = json_decode('{"a": {"foo": 1}, "b": {"foo": 2}}');
 
         // Act
         $parser->parse($data);

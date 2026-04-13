@@ -68,6 +68,6 @@ final readonly class UnionParser extends BaseParser implements CanBeFallback, Ca
             }
         }
 
-        throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+        throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
     }
 }

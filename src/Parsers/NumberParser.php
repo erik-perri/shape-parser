@@ -44,7 +44,7 @@ final readonly class NumberParser extends BaseParser implements CanBeFallback, C
     public function parse(mixed $data): int|float
     {
         if (! is_int($data) && ! is_float($data)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;

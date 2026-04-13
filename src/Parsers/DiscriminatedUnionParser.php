@@ -122,13 +122,13 @@ final readonly class DiscriminatedUnionParser extends BaseParser implements CanB
     public function parse(mixed $data): mixed
     {
         if (! is_array($data) && ! ($data instanceof stdClass)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         $data = (array) $data;
 
         if (! array_key_exists($this->discriminator, $data)) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Missing discriminator key "%s" in: %s',
                 $this->discriminator,
                 implode(', ', array_keys($data)),
@@ -138,7 +138,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser implements CanB
         $tagValue = $data[$this->discriminator];
 
         if (! is_string($tagValue) && ! is_int($tagValue)) {
-            throw new ParseException(sprintf(
+            throw ParseException::fromMessage(sprintf(
                 'Discriminator value for "%s" must be string or int, got %s',
                 $this->discriminator,
                 get_debug_type($tagValue),
@@ -148,7 +148,7 @@ final readonly class DiscriminatedUnionParser extends BaseParser implements CanB
         if (! isset($this->map[$tagValue])) {
             $allowed = implode(', ', array_keys($this->map));
 
-            throw new ParseException(sprintf('Unknown tag "%s". Expected one of: %s', $tagValue, $allowed));
+            throw ParseException::fromMessage(sprintf('Unknown tag "%s". Expected one of: %s', $tagValue, $allowed));
         }
 
         return $this->map[$tagValue]->parse($data);

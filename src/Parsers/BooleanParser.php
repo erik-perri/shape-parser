@@ -44,7 +44,7 @@ final readonly class BooleanParser extends BaseParser implements CanBeFallback, 
     public function parse(mixed $data): bool
     {
         if (! is_bool($data)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;

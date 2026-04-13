@@ -55,6 +55,7 @@ class LenientRecordParserTest extends TestCase
     {
         // Expectations
         $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Expected lenient<record<string, int>>, got string');
 
         // Arrange
         $lenientParser = Modifiers::lenient(new RecordParser(new StringParser, new IntegerParser));

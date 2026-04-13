@@ -56,7 +56,7 @@ final readonly class DateTimeParser extends BaseParser implements CanBeFallback,
     public function parse(mixed $data): DateTimeImmutable
     {
         if (! is_string($data)) {
-            throw new ParseException(sprintf('Expected datetime, got %s', get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected datetime, got %s', get_debug_type($data)));
         }
 
         $utc = new DateTimeZone('UTC');
@@ -72,6 +72,6 @@ final readonly class DateTimeParser extends BaseParser implements CanBeFallback,
             }
         }
 
-        throw new ParseException(sprintf('Expected datetime, got "%s"', $data));
+        throw ParseException::fromMessage(sprintf('Expected datetime, got "%s"', $data));
     }
 }

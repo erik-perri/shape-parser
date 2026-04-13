@@ -72,10 +72,14 @@ class NullableParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function test_parse_throws_on_invalid_non_null(BaseParser $inner, mixed $input): void
-    {
+    public function test_parse_throws_on_invalid_non_null(
+        BaseParser $inner,
+        mixed $input,
+        string $expectedMessage,
+    ): void {
         // Expectations
         $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         // Arrange
         $parser = Modifiers::nullable($inner);
@@ -96,14 +100,17 @@ class NullableParserTest extends TestCase
             'string given int' => [
                 'inner' => new StringParser,
                 'input' => 123,
+                'expectedMessage' => 'Expected string, got int',
             ],
             'integer given string' => [
                 'inner' => new IntegerParser,
                 'input' => 'hello',
+                'expectedMessage' => 'Expected int, got string',
             ],
             'boolean given string' => [
                 'inner' => new BooleanParser,
                 'input' => 'not-a-bool',
+                'expectedMessage' => 'Expected bool, got string',
             ],
         ];
     }

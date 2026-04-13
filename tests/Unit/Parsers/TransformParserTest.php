@@ -72,6 +72,7 @@ class TransformParserTest extends TestCase
     {
         // Expectations
         $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Expected string, got int');
 
         // Arrange
         $parser = Modifiers::transform(new StringParser, fn (string $s) => strtoupper($s));

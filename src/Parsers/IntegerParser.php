@@ -44,7 +44,7 @@ final readonly class IntegerParser extends BaseParser implements CanBeFallback, 
     public function parse(mixed $data): int
     {
         if (! is_int($data)) {
-            throw new ParseException(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
+            throw ParseException::fromMessage(sprintf('Expected %s, got %s', $this->describe(), get_debug_type($data)));
         }
 
         return $data;
