@@ -1,21 +1,9 @@
 services:
     -
-        class: Sourcetoad\ShapeParser\PHPStan\ShapeFactoryDynamicReturnTypeExtension
+        class: Sourcetoad\ShapeParser\PHPStan\ShapeDynamicReturnTypeExtension
         tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension
     -
         class: Sourcetoad\ShapeParser\PHPStan\LenientReturnTypeExtension
         tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: Sourcetoad\ShapeParser\PHPStan\FallbackReturnTypeExtension
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: Sourcetoad\ShapeParser\PHPStan\NullableReturnTypeExtension
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
-    -
-        class: Sourcetoad\ShapeParser\PHPStan\OptionalReturnTypeExtension
-        tags:
-            - phpstan.broker.dynamicMethodReturnTypeExtension
+            - phpstan.broker.dynamicStaticMethodReturnTypeExtension

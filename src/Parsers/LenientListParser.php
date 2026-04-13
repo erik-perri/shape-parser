@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
-use LogicException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 use stdClass;
 
 /**
@@ -14,7 +15,7 @@ use stdClass;
  *
  * @extends BaseParser<list<T>>
  */
-final readonly class LenientListParser extends BaseParser
+final readonly class LenientListParser extends BaseParser implements CanBeOptional, CanBeTransformed
 {
     /**
      * @param  ParserContract<T>  $parser
@@ -63,10 +64,5 @@ final readonly class LenientListParser extends BaseParser
 
         /** @var list<T> */
         return $result;
-    }
-
-    public function lenient(): never
-    {
-        throw new LogicException('Cannot call lenient() on an already lenient parser.');
     }
 }

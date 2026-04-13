@@ -7,6 +7,11 @@ namespace Sourcetoad\ShapeParser\Parsers;
 use ParseError;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 use stdClass;
 
 /**
@@ -14,7 +19,7 @@ use stdClass;
  *
  * @extends BaseParser<T>
  */
-final readonly class ObjectParser extends BaseParser
+final readonly class ObjectParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
     /**
      * @param  array<string, ParserContract<mixed>>  $shape
@@ -48,7 +53,7 @@ final readonly class ObjectParser extends BaseParser
 
         foreach ($this->shape as $key => $parser) {
             if (! array_key_exists($key, $data)) {
-                if ($parser instanceof OptionalParser) {
+                if ($parser instanceof BaseParser && $parser->isOptional()) {
                     continue;
                 }
 

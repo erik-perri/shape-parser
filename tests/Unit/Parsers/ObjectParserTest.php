@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
@@ -50,10 +51,10 @@ class ObjectParserTest extends TestCase
     {
         $optionalSchema = new ObjectParser([
             'foo' => new StringParser,
-            'bar' => (new StringParser)->optional(),
+            'bar' => Modifiers::optional(new StringParser),
         ]);
         $nullableOptionalSchema = new ObjectParser([
-            'foo' => (new StringParser)->nullable()->optional(),
+            'foo' => Modifiers::optional(Modifiers::nullable(new StringParser)),
         ]);
 
         return [
@@ -113,20 +114,20 @@ class ObjectParserTest extends TestCase
             ],
             'optional field present but wrong type' => [
                 'parser' => new ObjectParser([
-                    'foo' => (new StringParser)->optional(),
+                    'foo' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{"foo": 123}'),
             ],
             'optional field present but null on non-nullable inner' => [
                 'parser' => new ObjectParser([
-                    'foo' => (new StringParser)->optional(),
+                    'foo' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{"foo": null}'),
             ],
             'required field still fails when optional fields also absent' => [
                 'parser' => new ObjectParser([
                     'foo' => new StringParser,
-                    'bar' => (new StringParser)->optional(),
+                    'bar' => Modifiers::optional(new StringParser),
                 ]),
                 'data' => json_decode('{}'),
             ],

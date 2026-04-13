@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
@@ -58,14 +59,20 @@ class DiscriminatedUnionParserTest extends TestCase
     public function test_parse_accepts_transform_parser_variant(): void
     {
         // Arrange
-        $fooVariant = (new ObjectParser([
-            'type' => new LiteralParser('foo'),
-            'value' => new StringParser,
-        ]))->transform(fn (array $a) => strtoupper($a['value']));
-        $barVariant = (new ObjectParser([
-            'type' => new LiteralParser('bar'),
-            'bar' => new IntegerParser,
-        ]))->transform(fn (array $a) => $a['bar'] * 2);
+        $fooVariant = Modifiers::transform(
+            new ObjectParser([
+                'type' => new LiteralParser('foo'),
+                'value' => new StringParser,
+            ]),
+            fn (array $a) => strtoupper($a['value']),
+        );
+        $barVariant = Modifiers::transform(
+            new ObjectParser([
+                'type' => new LiteralParser('bar'),
+                'bar' => new IntegerParser,
+            ]),
+            fn (array $a) => $a['bar'] * 2,
+        );
 
         $parser = new DiscriminatedUnionParser('type', [$fooVariant, $barVariant]);
 
@@ -81,12 +88,16 @@ class DiscriminatedUnionParserTest extends TestCase
     public function test_parse_accepts_chained_transform_parser_variant(): void
     {
         // Arrange
-        $variant = (new ObjectParser([
-            'type' => new LiteralParser('foo'),
-            'value' => new IntegerParser,
-        ]))
-            ->transform(fn (array $a) => $a['value'] + 1)
-            ->transform(fn (int $i) => $i * 10);
+        $variant = Modifiers::transform(
+            Modifiers::transform(
+                new ObjectParser([
+                    'type' => new LiteralParser('foo'),
+                    'value' => new IntegerParser,
+                ]),
+                fn (array $a) => $a['value'] + 1,
+            ),
+            fn (int $i) => $i * 10,
+        );
 
         $parser = new DiscriminatedUnionParser('type', [$variant]);
 
@@ -121,9 +132,9 @@ class DiscriminatedUnionParserTest extends TestCase
                 'variant' => new StringParser,
             ],
             'nullable object parser' => [
-                'variant' => (new ObjectParser([
+                'variant' => Modifiers::nullable(new ObjectParser([
                     'type' => new LiteralParser('foo'),
-                ]))->nullable(),
+                ])),
             ],
         ];
     }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
-use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\Parsers\LenientListParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
@@ -20,8 +20,7 @@ class LenientListParserTest extends TestCase
     public function test_parse(mixed $input, array $expected): void
     {
         // Arrange
-        $parser = new ListParser(new StringParser);
-        $lenientParser = $parser->lenient();
+        $lenientParser = Modifiers::lenient(new ListParser(new StringParser));
 
         // Act
         $result = $lenientParser->parse($input);
@@ -58,8 +57,7 @@ class LenientListParserTest extends TestCase
         $this->expectException(ParseException::class);
 
         // Arrange
-        $parser = new ListParser(new StringParser);
-        $lenientParser = $parser->lenient();
+        $lenientParser = Modifiers::lenient(new ListParser(new StringParser));
 
         // Act
         $lenientParser->parse($input);
@@ -86,30 +84,12 @@ class LenientListParserTest extends TestCase
     public function test_describe_returns_lenient_wrapped_description(): void
     {
         // Arrange
-        $parser = new ListParser(new StringParser);
-        $lenientParser = $parser->lenient();
+        $lenientParser = Modifiers::lenient(new ListParser(new StringParser));
 
         // Act
         $description = $lenientParser->describe();
 
         // Assert
         $this->assertSame('lenient<list<string>>', $description);
-    }
-
-    public function test_double_lenient_throws(): void
-    {
-        // Expectations
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot call lenient() on an already lenient parser.');
-
-        // Arrange
-        $parser = new ListParser(new StringParser);
-        $lenientParser = $parser->lenient();
-
-        // Act
-        $lenientParser->lenient();
-
-        // Assert
-        // No assertions, only expectations.
     }
 }

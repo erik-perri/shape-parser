@@ -4,45 +4,49 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\PHPStan;
 
-use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeWithClassName;
+use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\ParserContract;
-use Sourcetoad\ShapeParser\Parsers\BaseParser;
 use Sourcetoad\ShapeParser\Parsers\LenientListParser;
 use Sourcetoad\ShapeParser\Parsers\LenientParser;
 use Sourcetoad\ShapeParser\Parsers\LenientRecordParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 
-class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
+class LenientReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
 {
     public function getClass(): string
     {
-        return BaseParser::class;
+        return Modifiers::class;
     }
 
-    public function isMethodSupported(MethodReflection $methodReflection): bool
+    public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
         return $methodReflection->getName() === 'lenient';
     }
 
-    public function getTypeFromMethodCall(
+    public function getTypeFromStaticMethodCall(
         MethodReflection $methodReflection,
-        MethodCall $methodCall,
-        Scope $scope
+        StaticCall $methodCall,
+        Scope $scope,
     ): ?Type {
-        $callerType = $scope->getType($methodCall->var);
+        $args = $methodCall->getArgs();
+
+        if (count($args) < 1) {
+            return null;
+        }
+
+        $argType = $scope->getType($args[0]->value);
 
         // ListParser -> LenientListParser<T>
-        if ($this->isSubtypeOf($callerType, ListParser::class)) {
-            $genericType = $this->resolveGenericParam($callerType, ParserContract::class);
+        if ($this->isSubtypeOf($argType, ListParser::class)) {
+            $genericType = $this->resolveGenericParam($argType, ParserContract::class);
 
             if ($genericType === null) {
                 return null;
@@ -56,8 +60,8 @@ class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
         }
 
         // RecordParser -> LenientRecordParser<K, T>
-        if ($this->isSubtypeOf($callerType, RecordParser::class)) {
-            $genericType = $this->resolveGenericParam($callerType, ParserContract::class);
+        if ($this->isSubtypeOf($argType, RecordParser::class)) {
+            $genericType = $this->resolveGenericParam($argType, ParserContract::class);
 
             if ($genericType === null) {
                 return null;
@@ -70,16 +74,14 @@ class LenientReturnTypeExtension implements DynamicMethodReturnTypeExtension
             return new GenericObjectType(LenientRecordParser::class, [$iterableKeyType, $iterableValueType]);
         }
 
-        // All others -> LenientParser<T> where output is T|null
-        $genericType = $this->resolveGenericParam($callerType, ParserContract::class);
+        // All others -> LenientParser<T>
+        $genericType = $this->resolveGenericParam($argType, ParserContract::class);
 
         if ($genericType === null) {
             return null;
         }
 
-        return new GenericObjectType(LenientParser::class, [
-            TypeCombinator::union($genericType, new NullType),
-        ]);
+        return new GenericObjectType(LenientParser::class, [$genericType]);
     }
 
     private function isSubtypeOf(Type $type, string $className): bool

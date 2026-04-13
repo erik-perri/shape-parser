@@ -7,11 +7,16 @@ namespace Sourcetoad\ShapeParser\Parsers;
 use DateTimeImmutable;
 use DateTimeZone;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 
 /**
  * @extends BaseParser<DateTimeImmutable>
  */
-final readonly class DateTimeParser extends BaseParser
+final readonly class DateTimeParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
     private const FORMATS = [
         '!Y-m-d\TH:i:s.up',

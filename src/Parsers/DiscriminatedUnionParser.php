@@ -7,6 +7,11 @@ namespace Sourcetoad\ShapeParser\Parsers;
 use InvalidArgumentException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 use stdClass;
 
 /**
@@ -14,7 +19,7 @@ use stdClass;
  *
  * @extends BaseParser<T>
  */
-final readonly class DiscriminatedUnionParser extends BaseParser
+final readonly class DiscriminatedUnionParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
     /**
      * @var array<string|int, ParserContract<T>>

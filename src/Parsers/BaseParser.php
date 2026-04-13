@@ -9,7 +9,7 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 
 /**
- * @template T
+ * @template-covariant T
  *
  * @implements ParserContract<T>
  */
@@ -26,40 +26,8 @@ abstract readonly class BaseParser implements ParserContract
         }
     }
 
-    /**
-     * @return BaseParser<T>
-     */
-    public function lenient(): BaseParser
+    public function isOptional(): bool
     {
-        // @phpstan-ignore return.type
-        return new LenientParser($this);
-    }
-
-    /**
-     * @return BaseParser<T>
-     */
-    public function nullable(): BaseParser
-    {
-        // @phpstan-ignore return.type
-        return new NullableParser($this);
-    }
-
-    /**
-     * @return BaseParser<T>
-     */
-    public function optional(): BaseParser
-    {
-        return new OptionalParser($this);
-    }
-
-    /**
-     * @template U
-     *
-     * @param  callable(T): U  $fn
-     * @return TransformParser<T, U>
-     */
-    public function transform(callable $fn): TransformParser
-    {
-        return new TransformParser($this, $fn(...));
+        return false;
     }
 }

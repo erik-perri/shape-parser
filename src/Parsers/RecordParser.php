@@ -6,6 +6,11 @@ namespace Sourcetoad\ShapeParser\Parsers;
 
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeFallback;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 use stdClass;
 
 /**
@@ -14,8 +19,24 @@ use stdClass;
  *
  * @extends BaseParser<array<K, T>>
  */
-final readonly class RecordParser extends BaseParser
+final readonly class RecordParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /**
+     * @return ParserContract<K>
+     */
+    public function innerKeyParser(): ParserContract
+    {
+        return $this->keyParser;
+    }
+
+    /**
+     * @return ParserContract<T>
+     */
+    public function innerValueParser(): ParserContract
+    {
+        return $this->valueParser;
+    }
+
     /**
      * @param  ParserContract<K>  $keyParser
      * @param  ParserContract<T>  $valueParser
@@ -68,13 +89,5 @@ final readonly class RecordParser extends BaseParser
         }
 
         return $result;
-    }
-
-    /**
-     * @return LenientRecordParser<K, T>
-     */
-    public function lenient(): BaseParser
-    {
-        return new LenientRecordParser($this->keyParser, $this->valueParser);
     }
 }

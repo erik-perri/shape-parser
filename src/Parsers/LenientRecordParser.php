@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
-use LogicException;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 use stdClass;
 
 /**
@@ -15,7 +16,7 @@ use stdClass;
  *
  * @extends BaseParser<array<K, T>>
  */
-final readonly class LenientRecordParser extends BaseParser
+final readonly class LenientRecordParser extends BaseParser implements CanBeOptional, CanBeTransformed
 {
     /**
      * @param  ParserContract<K>  $keyParser
@@ -71,10 +72,5 @@ final readonly class LenientRecordParser extends BaseParser
 
         /** @var array<K, T> */
         return $result;
-    }
-
-    public function lenient(): never
-    {
-        throw new LogicException('Cannot call lenient() on an already lenient parser.');
     }
 }

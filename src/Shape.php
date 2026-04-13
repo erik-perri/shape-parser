@@ -18,7 +18,7 @@ use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
 use Sourcetoad\ShapeParser\Parsers\UnionParser;
 
-class ShapeFactory
+final class Shape
 {
     /**
      * @template T
@@ -26,17 +26,17 @@ class ShapeFactory
      * @param  list<ParserContract<T>>  $parsers
      * @return DiscriminatedUnionParser<T>
      */
-    public function discriminatedUnion(string $discriminator, array $parsers): DiscriminatedUnionParser
+    public static function discriminatedUnion(string $discriminator, array $parsers): DiscriminatedUnionParser
     {
         return new DiscriminatedUnionParser($discriminator, $parsers);
     }
 
-    public function boolean(): BooleanParser
+    public static function boolean(): BooleanParser
     {
         return new BooleanParser;
     }
 
-    public function dateTime(): DateTimeParser
+    public static function dateTime(): DateTimeParser
     {
         return new DateTimeParser;
     }
@@ -47,17 +47,17 @@ class ShapeFactory
      * @param  class-string<TEnum>  $enumClass
      * @return EnumParser<TEnum>
      */
-    public function enum(string $enumClass): EnumParser
+    public static function enum(string $enumClass): EnumParser
     {
         return new EnumParser($enumClass);
     }
 
-    public function float(): FloatParser
+    public static function float(): FloatParser
     {
         return new FloatParser;
     }
 
-    public function integer(): IntegerParser
+    public static function integer(): IntegerParser
     {
         return new IntegerParser;
     }
@@ -68,7 +68,7 @@ class ShapeFactory
      * @param  T  $literal
      * @return LiteralParser<T>
      */
-    public function literal(bool|int|string $literal): LiteralParser
+    public static function literal(bool|int|string $literal): LiteralParser
     {
         return new LiteralParser($literal);
     }
@@ -79,12 +79,12 @@ class ShapeFactory
      * @param  ParserContract<T>  $parser
      * @return ListParser<T>
      */
-    public function list(ParserContract $parser): ListParser
+    public static function list(ParserContract $parser): ListParser
     {
         return new ListParser($parser);
     }
 
-    public function number(): NumberParser
+    public static function number(): NumberParser
     {
         return new NumberParser;
     }
@@ -93,7 +93,7 @@ class ShapeFactory
      * @param  array<string, ParserContract<mixed>>  $shape
      * @return ObjectParser<array<array-key, mixed>>
      */
-    public function object(array $shape): ObjectParser
+    public static function object(array $shape): ObjectParser
     {
         return new ObjectParser($shape);
     }
@@ -106,12 +106,12 @@ class ShapeFactory
      * @param  ParserContract<T>  $valueParser
      * @return RecordParser<K, T>
      */
-    public function record(ParserContract $keyParser, ParserContract $valueParser): RecordParser
+    public static function record(ParserContract $keyParser, ParserContract $valueParser): RecordParser
     {
         return new RecordParser($keyParser, $valueParser);
     }
 
-    public function string(): StringParser
+    public static function string(): StringParser
     {
         return new StringParser;
     }
@@ -122,7 +122,7 @@ class ShapeFactory
      * @param  ParserContract<T>  ...$parsers
      * @return UnionParser<T>
      */
-    public function union(ParserContract ...$parsers): UnionParser
+    public static function union(ParserContract ...$parsers): UnionParser
     {
         return new UnionParser(...$parsers);
     }

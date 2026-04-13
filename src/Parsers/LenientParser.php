@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Parsers;
 
-use LogicException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 
 /**
  * @template T
  *
  * @extends BaseParser<T|null>
  */
-final readonly class LenientParser extends BaseParser
+final readonly class LenientParser extends BaseParser implements CanBeOptional, CanBeTransformed
 {
     /**
      * @param  ParserContract<T>  $parser
@@ -35,22 +36,8 @@ final readonly class LenientParser extends BaseParser
         return $result->success ? $result->data : null;
     }
 
-    /**
-     * @return FallbackParser<T|null>
-     */
-    public function fallback(mixed $fallback): FallbackParser
+    public function isOptional(): bool
     {
-        /** @var FallbackParser<T|null> */
-        return new FallbackParser($this->parser, $fallback);
-    }
-
-    public function lenient(): never
-    {
-        throw new LogicException('Cannot call lenient() on an already lenient parser.');
-    }
-
-    public function nullable(): never
-    {
-        throw new LogicException('Cannot call nullable() on an already lenient parser.');
+        return $this->parser instanceof BaseParser && $this->parser->isOptional();
     }
 }

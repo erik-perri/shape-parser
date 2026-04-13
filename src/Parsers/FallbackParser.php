@@ -7,13 +7,15 @@ namespace Sourcetoad\ShapeParser\Parsers;
 use Sourcetoad\ShapeParser\Data\ParseResultData;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
+use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
 
 /**
  * @template T
  *
- * @implements ParserContract<T>
+ * @extends BaseParser<T>
  */
-final readonly class FallbackParser implements ParserContract
+final readonly class FallbackParser extends BaseParser implements CanBeOptional, CanBeTransformed
 {
     /**
      * @param  ParserContract<T>  $parser
@@ -46,6 +48,11 @@ final readonly class FallbackParser implements ParserContract
     public function safeParse(mixed $data): ParseResultData
     {
         return new ParseResultData(true, $this->parse($data), null);
+    }
+
+    public function isOptional(): bool
+    {
+        return $this->parser instanceof BaseParser && $this->parser->isOptional();
     }
 
     private function describeFallback(): string

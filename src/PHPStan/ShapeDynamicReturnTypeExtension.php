@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\PHPStan;
 
-use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
@@ -18,16 +18,16 @@ use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\UnionParser;
-use Sourcetoad\ShapeParser\ShapeFactory;
+use Sourcetoad\ShapeParser\Shape;
 
-class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
+class ShapeDynamicReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
 {
     public function getClass(): string
     {
-        return ShapeFactory::class;
+        return Shape::class;
     }
 
-    public function isMethodSupported(MethodReflection $methodReflection): bool
+    public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
         return in_array(
             $methodReflection->getName(),
@@ -36,10 +36,10 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         );
     }
 
-    public function getTypeFromMethodCall(
+    public function getTypeFromStaticMethodCall(
         MethodReflection $methodReflection,
-        MethodCall $methodCall,
-        Scope $scope
+        StaticCall $methodCall,
+        Scope $scope,
     ): ?Type {
         $methodArguments = $methodCall->getArgs();
 
@@ -62,7 +62,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         };
     }
 
-    private function resolveDiscriminatedUnion(MethodCall $methodCall, Scope $scope): ?Type
+    private function resolveDiscriminatedUnion(StaticCall $methodCall, Scope $scope): ?Type
     {
         $args = $methodCall->getArgs();
 
@@ -98,7 +98,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         ]);
     }
 
-    private function resolveList(MethodCall $methodCall, Scope $scope): ?Type
+    private function resolveList(StaticCall $methodCall, Scope $scope): ?Type
     {
         $args = $methodCall->getArgs();
 
@@ -115,7 +115,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         return new GenericObjectType(ListParser::class, [$innerType]);
     }
 
-    private function resolveUnion(MethodCall $methodCall, Scope $scope): ?Type
+    private function resolveUnion(StaticCall $methodCall, Scope $scope): ?Type
     {
         $variantTypes = [];
 
@@ -138,7 +138,7 @@ class ShapeFactoryDynamicReturnTypeExtension implements DynamicMethodReturnTypeE
         ]);
     }
 
-    private function resolveRecord(MethodCall $methodCall, Scope $scope): ?Type
+    private function resolveRecord(StaticCall $methodCall, Scope $scope): ?Type
     {
         $args = $methodCall->getArgs();
 

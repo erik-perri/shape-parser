@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 
-use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sourcetoad\ShapeParser\Exceptions\ParseException;
-use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Modifiers;
+use Sourcetoad\ShapeParser\Parsers\BaseParser;
 use Sourcetoad\ShapeParser\Parsers\BooleanParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
@@ -20,10 +20,10 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class NullableParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function test_parse(ParserContract $inner, mixed $input, mixed $expected): void
+    public function test_parse(BaseParser $inner, mixed $input, mixed $expected): void
     {
         // Arrange
-        $parser = $inner->nullable();
+        $parser = Modifiers::nullable($inner);
 
         // Act
         $result = $parser->parse($input);
@@ -33,7 +33,7 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{inner: ParserContract<mixed>, input: mixed, expected: mixed}>
+     * @return array<string, array{inner: BaseParser<mixed>, input: mixed, expected: mixed}>
      */
     public static function parseCasesProvider(): array
     {
@@ -72,13 +72,13 @@ class NullableParserTest extends TestCase
     }
 
     #[DataProvider('invalidCasesProvider')]
-    public function test_parse_throws_on_invalid_non_null(ParserContract $inner, mixed $input): void
+    public function test_parse_throws_on_invalid_non_null(BaseParser $inner, mixed $input): void
     {
         // Expectations
         $this->expectException(ParseException::class);
 
         // Arrange
-        $parser = $inner->nullable();
+        $parser = Modifiers::nullable($inner);
 
         // Act
         $parser->parse($input);
@@ -88,7 +88,7 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{inner: ParserContract<mixed>, input: mixed}>
+     * @return array<string, array{inner: BaseParser<mixed>, input: mixed}>
      */
     public static function invalidCasesProvider(): array
     {
@@ -109,10 +109,10 @@ class NullableParserTest extends TestCase
     }
 
     #[DataProvider('describeCasesProvider')]
-    public function test_describe(ParserContract $inner, string $expected): void
+    public function test_describe(BaseParser $inner, string $expected): void
     {
         // Arrange
-        $parser = $inner->nullable();
+        $parser = Modifiers::nullable($inner);
 
         // Act
         $description = $parser->describe();
@@ -122,7 +122,7 @@ class NullableParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{inner: ParserContract<mixed>, expected: string}>
+     * @return array<string, array{inner: BaseParser<mixed>, expected: string}>
      */
     public static function describeCasesProvider(): array
     {
@@ -142,30 +142,25 @@ class NullableParserTest extends TestCase
         ];
     }
 
-    public function test_double_nullable_throws(): void
-    {
-        // Expectations
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Cannot call nullable() on an already nullable parser.');
-
-        // Arrange
-        $parser = (new StringParser)->nullable();
-
-        // Act
-        $parser->nullable();
-
-        // Assert
-        // No assertions, only expectations.
-    }
-
     public function test_nullable_lenient_chain_is_allowed(): void
     {
         // Arrange
-        $parser = (new StringParser)->nullable()->lenient();
+        $parser = Modifiers::lenient(Modifiers::nullable(new StringParser));
 
         // Act + Assert
         $this->assertNull($parser->parse(null));
         $this->assertNull($parser->parse(123));
+        $this->assertSame('hello', $parser->parse('hello'));
+    }
+
+    public function test_nullable_wrapping_optional_propagates_optional(): void
+    {
+        // Arrange
+        $parser = Modifiers::nullable(Modifiers::optional(new StringParser));
+
+        // Act + Assert
+        $this->assertTrue($parser->isOptional());
+        $this->assertNull($parser->parse(null));
         $this->assertSame('hello', $parser->parse('hello'));
     }
 }

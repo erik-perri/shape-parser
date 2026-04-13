@@ -7,7 +7,8 @@ namespace Sourcetoad\ShapeParser\Tests\Unit\Parsers;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Sourcetoad\ShapeParser\ParserContract;
+use Sourcetoad\ShapeParser\Modifiers;
+use Sourcetoad\ShapeParser\Parsers\BaseParser;
 use Sourcetoad\ShapeParser\Parsers\FallbackParser;
 use Sourcetoad\ShapeParser\Parsers\IntegerParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
@@ -17,10 +18,10 @@ use Sourcetoad\ShapeParser\Parsers\StringParser;
 class FallbackParserTest extends TestCase
 {
     #[DataProvider('parseCasesProvider')]
-    public function test_parse(ParserContract $inner, mixed $fallback, mixed $input, mixed $expected): void
+    public function test_parse(BaseParser $inner, mixed $fallback, mixed $input, mixed $expected): void
     {
         // Arrange
-        $fallbackParser = $inner->lenient()->fallback($fallback);
+        $fallbackParser = Modifiers::fallback($inner, $fallback);
 
         // Act
         $result = $fallbackParser->parse($input);
@@ -30,7 +31,7 @@ class FallbackParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{inner: ParserContract<mixed>, fallback: mixed, input: mixed, expected: mixed}>
+     * @return array<string, array{inner: BaseParser<mixed>, fallback: mixed, input: mixed, expected: mixed}>
      */
     public static function parseCasesProvider(): array
     {
@@ -60,8 +61,7 @@ class FallbackParserTest extends TestCase
     public function test_safe_parse_returns_success(mixed $input, mixed $expected): void
     {
         // Arrange
-        $parser = new StringParser;
-        $fallbackParser = $parser->lenient()->fallback('fallback');
+        $fallbackParser = Modifiers::fallback(new StringParser, 'fallback');
 
         // Act
         $result = $fallbackParser->safeParse($input);
@@ -90,10 +90,10 @@ class FallbackParserTest extends TestCase
     }
 
     #[DataProvider('describeCasesProvider')]
-    public function test_describe(ParserContract $inner, mixed $fallback, string $expected): void
+    public function test_describe(BaseParser $inner, mixed $fallback, string $expected): void
     {
         // Arrange
-        $fallbackParser = $inner->lenient()->fallback($fallback);
+        $fallbackParser = Modifiers::fallback($inner, $fallback);
 
         // Act
         $description = $fallbackParser->describe();
@@ -103,7 +103,7 @@ class FallbackParserTest extends TestCase
     }
 
     /**
-     * @return array<string, array{inner: ParserContract<mixed>, fallback: mixed, expected: string}>
+     * @return array<string, array{inner: BaseParser<mixed>, fallback: mixed, expected: string}>
      */
     public static function describeCasesProvider(): array
     {
