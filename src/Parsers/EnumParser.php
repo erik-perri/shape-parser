@@ -11,6 +11,11 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasFallback;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasLenient;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasNullable;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 use UnitEnum;
 
 /**
@@ -20,6 +25,21 @@ use UnitEnum;
  */
 final readonly class EnumParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /** @use HasFallback<TEnum> */
+    use HasFallback;
+
+    /** @use HasLenient<TEnum> */
+    use HasLenient;
+
+    /** @use HasNullable<TEnum> */
+    use HasNullable;
+
+    /** @use HasOptional<TEnum> */
+    use HasOptional;
+
+    /** @use HasTransformed<TEnum> */
+    use HasTransformed;
+
     /**
      * @param  class-string<TEnum>  $enumClass
      */

@@ -12,12 +12,32 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasFallback;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasLenient;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasNullable;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 
 /**
  * @extends BaseParser<DateTimeImmutable>
  */
 final readonly class DateTimeParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /** @use HasFallback<DateTimeImmutable> */
+    use HasFallback;
+
+    /** @use HasLenient<DateTimeImmutable> */
+    use HasLenient;
+
+    /** @use HasNullable<DateTimeImmutable> */
+    use HasNullable;
+
+    /** @use HasOptional<DateTimeImmutable> */
+    use HasOptional;
+
+    /** @use HasTransformed<DateTimeImmutable> */
+    use HasTransformed;
+
     private const FORMATS = [
         '!Y-m-d\TH:i:s.up',
         '!Y-m-d\TH:i:s.vp',

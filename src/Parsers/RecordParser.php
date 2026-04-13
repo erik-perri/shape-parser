@@ -11,6 +11,11 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasFallback;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasLenient;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasNullable;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 use stdClass;
 
 /**
@@ -21,6 +26,21 @@ use stdClass;
  */
 final readonly class RecordParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /** @use HasFallback<array<K, T>> */
+    use HasFallback;
+
+    /** @use HasLenient<array<K, T>> */
+    use HasLenient;
+
+    /** @use HasNullable<array<K, T>> */
+    use HasNullable;
+
+    /** @use HasOptional<array<K, T>> */
+    use HasOptional;
+
+    /** @use HasTransformed<array<K, T>> */
+    use HasTransformed;
+
     /**
      * @return ParserContract<K>
      */

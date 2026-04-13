@@ -12,6 +12,11 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasFallback;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasLenient;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasNullable;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 
 /**
  * @template TIn
@@ -21,6 +26,21 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
  */
 final readonly class TransformParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /** @use HasFallback<TOut> */
+    use HasFallback;
+
+    /** @use HasLenient<TOut> */
+    use HasLenient;
+
+    /** @use HasNullable<TOut> */
+    use HasNullable;
+
+    /** @use HasOptional<TOut> */
+    use HasOptional;
+
+    /** @use HasTransformed<TOut> */
+    use HasTransformed;
+
     /**
      * @param  ParserContract<TIn>  $parser
      * @param  Closure(TIn): TOut  $fn

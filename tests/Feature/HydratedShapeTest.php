@@ -6,7 +6,6 @@ namespace Sourcetoad\ShapeParser\Tests\Feature;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use Sourcetoad\ShapeParser\Modifiers;
 use Sourcetoad\ShapeParser\Shape;
 use Sourcetoad\ShapeParser\Tests\Fixtures\ContentData;
 use Sourcetoad\ShapeParser\Tests\Fixtures\PostData;
@@ -46,44 +45,32 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $parser = Modifiers::lenient(
-            Shape::list(
-                Shape::discriminatedUnion('version', [
-                    Modifiers::transform(
-                        Shape::object([
-                            'version' => Shape::literal(1),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                        ]),
-                        fn (array $a) => new ContentData($a['id'], $a['title'], null),
-                    ),
-                    Modifiers::transform(
-                        Shape::object([
-                            'version' => Shape::literal(2),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                            'url' => Shape::string(),
-                        ]),
-                        fn (array $a) => new ContentData($a['id'], $a['title'], $a['url']),
-                    ),
-                    Modifiers::transform(
-                        Shape::object([
-                            'version' => Shape::literal(3),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                            'link' => Shape::string(),
-                        ]),
-                        fn (array $a) => new ContentData($a['id'], $a['title'], $a['link']),
-                    ),
-                ]),
-            ),
-        );
+        $parser = Shape::list(
+            Shape::discriminatedUnion('version', [
+                Shape::object([
+                    'version' => Shape::literal(1),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], null)),
+                Shape::object([
+                    'version' => Shape::literal(2),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                    'url' => Shape::string(),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['url'])),
+                Shape::object([
+                    'version' => Shape::literal(3),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                    'link' => Shape::string(),
+                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['link'])),
+            ]),
+        )->lenient();
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertIsArray($result);
         $this->assertCount(3, $result);
 
         $this->assertInstanceOf(ContentData::class, $result[0]);
@@ -133,42 +120,36 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $parser = Modifiers::lenient(
-            Shape::list(
-                Modifiers::transform(
-                    Shape::discriminatedUnion('version', [
-                        Shape::object([
-                            'version' => Shape::literal(1),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                        ]),
-                        Shape::object([
-                            'version' => Shape::literal(2),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                            'url' => Shape::string(),
-                        ]),
-                        Shape::object([
-                            'version' => Shape::literal(3),
-                            'id' => Shape::integer(),
-                            'title' => Shape::string(),
-                            'link' => Shape::string(),
-                        ]),
-                    ]),
-                    fn (array $parsed) => match ($parsed['version']) {
-                        1 => new ContentData($parsed['id'], $parsed['title'], null),
-                        2 => new ContentData($parsed['id'], $parsed['title'], $parsed['url']),
-                        3 => new ContentData($parsed['id'], $parsed['title'], $parsed['link']),
-                    },
-                ),
-            ),
-        );
+        $parser = Shape::list(
+            Shape::discriminatedUnion('version', [
+                Shape::object([
+                    'version' => Shape::literal(1),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                ]),
+                Shape::object([
+                    'version' => Shape::literal(2),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                    'url' => Shape::string(),
+                ]),
+                Shape::object([
+                    'version' => Shape::literal(3),
+                    'id' => Shape::integer(),
+                    'title' => Shape::string(),
+                    'link' => Shape::string(),
+                ]),
+            ])->transform(fn (array $parsed) => match ($parsed['version']) {
+                1 => new ContentData($parsed['id'], $parsed['title'], null),
+                2 => new ContentData($parsed['id'], $parsed['title'], $parsed['url']),
+                3 => new ContentData($parsed['id'], $parsed['title'], $parsed['link']),
+            }),
+        )->lenient();
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertIsArray($result);
         $this->assertCount(3, $result);
 
         $this->assertInstanceOf(ContentData::class, $result[0]);
@@ -199,27 +180,21 @@ class HydratedShapeTest extends TestCase
             ],
         ];
 
-        $parser = Modifiers::transform(
-            Shape::object([
-                'title' => Shape::string(),
-                'author' => Modifiers::transform(
-                    Shape::object([
-                        'user_id' => Shape::integer(),
-                        'first_name' => Shape::string(),
-                        'created_at' => Shape::string(),
-                    ]),
-                    fn (array $a) => new UserData(
-                        userId: $a['user_id'],
-                        firstName: $a['first_name'],
-                        createdAt: $a['created_at'],
-                    ),
-                ),
-            ]),
-            fn (array $a) => new PostData(
-                title: $a['title'],
-                author: $a['author'],
-            ),
-        );
+        $parser = Shape::object([
+            'title' => Shape::string(),
+            'author' => Shape::object([
+                'user_id' => Shape::integer(),
+                'first_name' => Shape::string(),
+                'created_at' => Shape::string(),
+            ])->transform(fn (array $a) => new UserData(
+                userId: $a['user_id'],
+                firstName: $a['first_name'],
+                createdAt: $a['created_at'],
+            )),
+        ])->transform(fn (array $a) => new PostData(
+            title: $a['title'],
+            author: $a['author'],
+        ));
 
         // Act
         $result = $parser->parse($data);

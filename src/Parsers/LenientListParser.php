@@ -8,6 +8,8 @@ use Sourcetoad\ShapeParser\Exceptions\ParseException;
 use Sourcetoad\ShapeParser\ParserContract;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 use stdClass;
 
 /**
@@ -17,6 +19,12 @@ use stdClass;
  */
 final readonly class LenientListParser extends BaseParser implements CanBeOptional, CanBeTransformed
 {
+    /** @use HasOptional<list<T>> */
+    use HasOptional;
+
+    /** @use HasTransformed<list<T>> */
+    use HasTransformed;
+
     /**
      * @param  ParserContract<T>  $parser
      */

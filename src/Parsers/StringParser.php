@@ -10,12 +10,32 @@ use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeLenient;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeNullable;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeOptional;
 use Sourcetoad\ShapeParser\Parsers\Contracts\CanBeTransformed;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasFallback;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasLenient;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasNullable;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasOptional;
+use Sourcetoad\ShapeParser\Parsers\Traits\HasTransformed;
 
 /**
  * @extends BaseParser<string>
  */
 final readonly class StringParser extends BaseParser implements CanBeFallback, CanBeLenient, CanBeNullable, CanBeOptional, CanBeTransformed
 {
+    /** @use HasFallback<string> */
+    use HasFallback;
+
+    /** @use HasLenient<string> */
+    use HasLenient;
+
+    /** @use HasNullable<string> */
+    use HasNullable;
+
+    /** @use HasOptional<string> */
+    use HasOptional;
+
+    /** @use HasTransformed<string> */
+    use HasTransformed;
+
     public function describe(): string
     {
         return 'string';
