@@ -121,6 +121,96 @@ class ShapeTypeTest
         assertType('list<string>', $result);
     }
 
+    public function testTuple(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", 42]');
+
+        $parser = Shape::tuple(Shape::string(), Shape::integer());
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{string, int}', $result);
+    }
+
+    public function testTupleOfThree(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", 42, true]');
+
+        $parser = Shape::tuple(Shape::string(), Shape::integer(), Shape::boolean());
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{string, int, bool}', $result);
+    }
+
+    public function testNullableTuple(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", 42]');
+
+        $parser = Modifiers::nullable(Shape::tuple(Shape::string(), Shape::integer()));
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{string, int}|null', $result);
+    }
+
+    public function testLenientTuple(): void
+    {
+        // Arrange
+        $data = json_decode('["foo", 42]');
+
+        $parser = Modifiers::lenient(Shape::tuple(Shape::string(), Shape::integer()));
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{string, int}|null', $result);
+    }
+
+    public function testTransformTupleToDto(): void
+    {
+        // Arrange
+        $data = json_decode('["Foo", 1]');
+
+        $parser = Modifiers::transform(
+            Shape::tuple(Shape::string(), Shape::integer()),
+            fn (array $t): SampleData => new SampleData($t[1], $t[0]),
+        );
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('Sourcetoad\ShapeParser\Tests\Fixtures\SampleData', $result);
+    }
+
+    public function testTupleInsideObject(): void
+    {
+        // Arrange
+        $data = json_decode('{"label": "x", "coord": [1.0, 2.0]}');
+
+        $parser = Shape::object([
+            'label' => Shape::string(),
+            'coord' => Shape::tuple(Shape::float(), Shape::float()),
+        ]);
+
+        // Act
+        $result = $parser->parse($data);
+
+        // Assert
+        assertType('array{label: string, coord: array{float, float}}', $result);
+    }
+
     public function testEnum(): void
     {
         // Arrange

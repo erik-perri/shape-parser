@@ -7,6 +7,8 @@ namespace Sourcetoad\ShapeParser\PHPStan;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
+use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\Type;
@@ -17,6 +19,7 @@ use Sourcetoad\ShapeParser\Parsers\DiscriminatedUnionParser;
 use Sourcetoad\ShapeParser\Parsers\ListParser;
 use Sourcetoad\ShapeParser\Parsers\LiteralParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
+use Sourcetoad\ShapeParser\Parsers\TupleParser;
 use Sourcetoad\ShapeParser\Parsers\UnionParser;
 use Sourcetoad\ShapeParser\Shape;
 
@@ -31,7 +34,7 @@ class ShapeDynamicReturnTypeExtension implements DynamicStaticMethodReturnTypeEx
     {
         return in_array(
             $methodReflection->getName(),
-            ['discriminatedUnion', 'list', 'literal', 'object', 'record', 'union'],
+            ['discriminatedUnion', 'list', 'literal', 'object', 'record', 'tuple', 'union'],
             true,
         );
     }
@@ -57,9 +60,27 @@ class ShapeDynamicReturnTypeExtension implements DynamicStaticMethodReturnTypeEx
                 $scope->getType($methodArguments[0]->value),
             ),
             'record' => $this->resolveRecord($methodCall, $scope),
+            'tuple' => $this->resolveTuple($methodCall, $scope),
             'union' => $this->resolveUnion($methodCall, $scope),
             default => null,
         };
+    }
+
+    private function resolveTuple(StaticCall $methodCall, Scope $scope): ?Type
+    {
+        $builder = ConstantArrayTypeBuilder::createEmpty();
+
+        foreach ($methodCall->getArgs() as $index => $arg) {
+            $innerType = $this->resolveParserContractGeneric($scope->getType($arg->value));
+
+            if ($innerType === null) {
+                return null;
+            }
+
+            $builder->setOffsetValueType(new ConstantIntegerType($index), $innerType);
+        }
+
+        return new GenericObjectType(TupleParser::class, [$builder->getArray()]);
     }
 
     private function resolveDiscriminatedUnion(StaticCall $methodCall, Scope $scope): ?Type

@@ -19,74 +19,79 @@ class HydratedShapeTest extends TestCase
         // Arrange
         $data = [
             [
-                'id' => 1,
-                'title' => 'Sample title A',
-                'version' => 1,
-            ],
-            [
-                'id' => 2,
-                'title' => 'Sample title B',
-                'url' => 'https://example.com',
-                'version' => 2,
-            ],
-            [
-                'id' => 3,
-                'title' => 'Sample title C',
-                'link' => 'https://example.com',
-                'version' => 3,
-            ],
-            [
-                'id' => 4,
-                'title' => 'Sample title D',
-                'link' => [
-                    'url' => 'https://example.com',
+                [
+                    'id' => 1,
+                    'title' => 'Sample title A',
+                    'version' => 1,
                 ],
-                'version' => 4,
+                [
+                    'id' => 2,
+                    'title' => 'Sample title B',
+                    'url' => 'https://example.com',
+                    'version' => 2,
+                ],
+                [
+                    'id' => 3,
+                    'title' => 'Sample title C',
+                    'link' => 'https://example.com',
+                    'version' => 3,
+                ],
+                [
+                    'id' => 4,
+                    'title' => 'Sample title D',
+                    'link' => [
+                        'url' => 'https://example.com',
+                    ],
+                    'version' => 4,
+                ],
             ],
         ];
 
-        $parser = Shape::list(
-            Shape::discriminatedUnion('version', [
-                Shape::object([
-                    'version' => Shape::literal(1),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], null)),
-                Shape::object([
-                    'version' => Shape::literal(2),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                    'url' => Shape::string(),
-                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['url'])),
-                Shape::object([
-                    'version' => Shape::literal(3),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                    'link' => Shape::string(),
-                ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['link'])),
-            ]),
-        )->lenient();
+        $parser = Shape::tuple(
+            Shape::list(
+                Shape::discriminatedUnion('version', [
+                    Shape::object([
+                        'version' => Shape::literal(1),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                    ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], null)),
+                    Shape::object([
+                        'version' => Shape::literal(2),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                        'url' => Shape::string(),
+                    ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['url'])),
+                    Shape::object([
+                        'version' => Shape::literal(3),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                        'link' => Shape::string(),
+                    ])->transform(fn (array $a) => new ContentData($a['id'], $a['title'], $a['link'])),
+                ]),
+            )->lenient(),
+        );
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertCount(3, $result);
+        $this->assertCount(1, $result);
+        $this->assertCount(3, $result[0]);
 
-        $this->assertInstanceOf(ContentData::class, $result[0]);
-        $this->assertSame(1, $result[0]->id);
-        $this->assertSame('Sample title A', $result[0]->title);
-        $this->assertNull($result[0]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][0]);
+        $this->assertSame(1, $result[0][0]->id);
+        $this->assertSame('Sample title A', $result[0][0]->title);
+        $this->assertNull($result[0][0]->url);
 
-        $this->assertInstanceOf(ContentData::class, $result[1]);
-        $this->assertSame(2, $result[1]->id);
-        $this->assertSame('Sample title B', $result[1]->title);
-        $this->assertSame('https://example.com', $result[1]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][1]);
+        $this->assertSame(2, $result[0][1]->id);
+        $this->assertSame('Sample title B', $result[0][1]->title);
+        $this->assertSame('https://example.com', $result[0][1]->url);
 
-        $this->assertInstanceOf(ContentData::class, $result[2]);
-        $this->assertSame(3, $result[2]->id);
-        $this->assertSame('Sample title C', $result[2]->title);
-        $this->assertSame('https://example.com', $result[2]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][2]);
+        $this->assertSame(3, $result[0][2]->id);
+        $this->assertSame('Sample title C', $result[0][2]->title);
+        $this->assertSame('https://example.com', $result[0][2]->url);
     }
 
     public function test_discriminated_union_hydrates_result_dto(): void
@@ -94,78 +99,83 @@ class HydratedShapeTest extends TestCase
         // Arrange
         $data = [
             [
-                'id' => 1,
-                'title' => 'Sample title A',
-                'version' => 1,
-            ],
-            [
-                'id' => 2,
-                'title' => 'Sample title B',
-                'url' => 'https://example.com',
-                'version' => 2,
-            ],
-            [
-                'id' => 3,
-                'title' => 'Sample title C',
-                'link' => 'https://example.com',
-                'version' => 3,
-            ],
-            [
-                'id' => 4,
-                'title' => 'Sample title D',
-                'link' => [
-                    'url' => 'https://example.com',
+                [
+                    'id' => 1,
+                    'title' => 'Sample title A',
+                    'version' => 1,
                 ],
-                'version' => 4,
+                [
+                    'id' => 2,
+                    'title' => 'Sample title B',
+                    'url' => 'https://example.com',
+                    'version' => 2,
+                ],
+                [
+                    'id' => 3,
+                    'title' => 'Sample title C',
+                    'link' => 'https://example.com',
+                    'version' => 3,
+                ],
+                [
+                    'id' => 4,
+                    'title' => 'Sample title D',
+                    'link' => [
+                        'url' => 'https://example.com',
+                    ],
+                    'version' => 4,
+                ],
             ],
         ];
 
-        $parser = Shape::list(
-            Shape::discriminatedUnion('version', [
-                Shape::object([
-                    'version' => Shape::literal(1),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                ]),
-                Shape::object([
-                    'version' => Shape::literal(2),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                    'url' => Shape::string(),
-                ]),
-                Shape::object([
-                    'version' => Shape::literal(3),
-                    'id' => Shape::integer(),
-                    'title' => Shape::string(),
-                    'link' => Shape::string(),
-                ]),
-            ])->transform(fn (array $parsed) => match ($parsed['version']) {
-                1 => new ContentData($parsed['id'], $parsed['title'], null),
-                2 => new ContentData($parsed['id'], $parsed['title'], $parsed['url']),
-                3 => new ContentData($parsed['id'], $parsed['title'], $parsed['link']),
-            }),
-        )->lenient();
+        $parser = Shape::tuple(
+            Shape::list(
+                Shape::discriminatedUnion('version', [
+                    Shape::object([
+                        'version' => Shape::literal(1),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                    ]),
+                    Shape::object([
+                        'version' => Shape::literal(2),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                        'url' => Shape::string(),
+                    ]),
+                    Shape::object([
+                        'version' => Shape::literal(3),
+                        'id' => Shape::integer(),
+                        'title' => Shape::string(),
+                        'link' => Shape::string(),
+                    ]),
+                ])->transform(fn (array $parsed) => match ($parsed['version']) {
+                    1 => new ContentData($parsed['id'], $parsed['title'], null),
+                    2 => new ContentData($parsed['id'], $parsed['title'], $parsed['url']),
+                    3 => new ContentData($parsed['id'], $parsed['title'], $parsed['link']),
+                }),
+            )->lenient(),
+        );
 
         // Act
         $result = $parser->parse($data);
 
         // Assert
-        $this->assertCount(3, $result);
+        $this->assertCount(1, $result);
+        $this->assertCount(3, $result[0]);
 
-        $this->assertInstanceOf(ContentData::class, $result[0]);
-        $this->assertSame(1, $result[0]->id);
-        $this->assertSame('Sample title A', $result[0]->title);
-        $this->assertNull($result[0]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][0]);
+        $this->assertSame(1, $result[0][0]->id);
+        $this->assertSame('Sample title A', $result[0][0]->title);
+        $this->assertNull($result[0][0]->url);
 
-        $this->assertInstanceOf(ContentData::class, $result[1]);
-        $this->assertSame(2, $result[1]->id);
-        $this->assertSame('Sample title B', $result[1]->title);
-        $this->assertSame('https://example.com', $result[1]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][1]);
+        $this->assertSame(2, $result[0][1]->id);
+        $this->assertSame('Sample title B', $result[0][1]->title);
+        $this->assertSame('https://example.com', $result[0][1]->url);
 
-        $this->assertInstanceOf(ContentData::class, $result[2]);
-        $this->assertSame(3, $result[2]->id);
-        $this->assertSame('Sample title C', $result[2]->title);
-        $this->assertSame('https://example.com', $result[2]->url);
+        $this->assertInstanceOf(ContentData::class, $result[0][2]);
+        $this->assertSame(3, $result[0][2]->id);
+        $this->assertSame('Sample title C', $result[0][2]->title);
+        $this->assertSame('https://example.com', $result[0][2]->url);
     }
 
     public function test_nested_dto_hydration_is_bottom_up(): void

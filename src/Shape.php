@@ -16,6 +16,7 @@ use Sourcetoad\ShapeParser\Parsers\NumberParser;
 use Sourcetoad\ShapeParser\Parsers\ObjectParser;
 use Sourcetoad\ShapeParser\Parsers\RecordParser;
 use Sourcetoad\ShapeParser\Parsers\StringParser;
+use Sourcetoad\ShapeParser\Parsers\TupleParser;
 use Sourcetoad\ShapeParser\Parsers\UnionParser;
 
 final class Shape
@@ -114,6 +115,15 @@ final class Shape
     public static function string(): StringParser
     {
         return new StringParser;
+    }
+
+    /**
+     * @param  ParserContract<mixed>  ...$parsers
+     * @return TupleParser<array<array-key, mixed>>
+     */
+    public static function tuple(ParserContract ...$parsers): TupleParser
+    {
+        return new TupleParser(...$parsers);
     }
 
     /**
